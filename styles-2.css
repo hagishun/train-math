@@ -1,0 +1,36 @@
+@media(max-width:850px){
+  .car{width:380px}
+  .frontcar .pd1{left:14px}.frontcar .pd2{left:85px}.frontcar .pd3{left:156px}.frontcar .pd4{left:227px}
+  .frontcar .sw1{left:55px;width:26px}.frontcar .sw2{left:126px;width:26px}.frontcar .sw3{left:197px;width:26px}
+  .frontcar .cab205{width:105px}
+}
+.doorCamera{
+  position:absolute;right:12px;bottom:12px;width:220px;height:150px;z-index:28;
+  border:5px solid #20292e;border-radius:10px;background:#101618;
+  box-shadow:0 5px 14px rgba(0,0,0,.35);overflow:hidden;
+}
+.doorCamera .camHeader{height:28px;padding:3px 8px;display:flex;align-items:center;justify-content:space-between;background:#20292e;color:#fff;font-weight:1000;font-size:13px}
+.doorCamera .rec{display:inline-flex;align-items:center;gap:5px}
+.doorCamera .rec:before{content:"";width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 5px #ff3b30}
+.doorCamera .camView{position:absolute;left:7px;right:7px;top:35px;bottom:8px;border:2px solid #657176;background:linear-gradient(to bottom,#9da5a8 0 8%,#e7eaeb 8% 72%,#565d60 72% 84%,#e0c91c 84% 91%,#555 91%);overflow:hidden}
+.doorCamera .camStripeG{position:absolute;left:0;right:0;top:58px;height:11px;background:var(--green)}
+.doorCamera .camStripeL{position:absolute;left:0;right:0;top:69px;height:7px;background:var(--lime)}
+.doorCamera .camDoor{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:90px;height:94px;border:3px solid #606a6d;background:#161b1d;overflow:hidden}
+.doorCamera .camInside{position:absolute;inset:0;background:linear-gradient(to bottom,#273034 0 64%,#777 64% 83%,#dfca1a 83% 90%,#393f42 90%)}
+.doorCamera .camLeaf{position:absolute;top:0;bottom:0;width:50%;background:linear-gradient(#fbfbfb,#e0e4e5);transition:transform .85s ease;z-index:3}
+.doorCamera .camLeaf.left{left:0;border-right:1px solid #777}.doorCamera .camLeaf.right{right:0;border-left:1px solid #777}
+.doorCamera .camLeaf:before{content:"";position:absolute;top:12px;width:17px;height:42px;background:#263436;border:2px solid #646e71}
+.doorCamera .camLeaf.left:before{left:9px}.doorCamera .camLeaf.right:before{right:9px}
+.doorCamera.open .camLeaf.left{transform:translateX(-105%)}.doorCamera.open .camLeaf.right{transform:translateX(105%)}
+.doorCamera .camState{position:absolute;right:5px;bottom:4px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.75);color:#93ff9a;font-size:11px;font-weight:1000;z-index:5}
+.doorCamera.open .camState{color:#ffe76c}
+@media(max-width:850px){.doorCamera{width:180px;height:126px;right:8px;bottom:8px}.doorCamera .camHeader{height:24px;font-size:11px}.doorCamera .camView{top:29px}.doorCamera .camDoor{width:74px;height:78px}.doorCamera .camLeaf:before{top:9px;width:14px;height:34px}.doorCamera .camStripeG{top:47px;height:9px}.doorCamera .camStripeL{top:56px;height:6px}}
+.modePanel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.modeBtn{min-height:48px;border:4px solid var(--ink);border-radius:10px;background:white;box-shadow:0 4px 0 var(--ink);font-weight:1000;cursor:pointer}.modeBtn.selected{background:#ffe77d}.modeBtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.modeLabel{margin-top:5px;font-size:13px;font-weight:900}.graphWrap{min-height:150px;border:3px solid var(--ink);border-radius:12px;background:white;padding:6px}.graphWrap svg{width:100%;height:170px}.graph-grid{stroke:#ccd5d9;stroke-width:1}.graph-axis{stroke:#334;stroke-width:2}.graph-line{fill:none;stroke:#3d8a50;stroke-width:4}.graph-point{fill:white;stroke:#3d8a50;stroke-width:3}.graph-label{font-size:11px;font-weight:800;fill:#203040}.graph-value{font-size:11px;font-weight:900;fill:#203040}.problem-tabs{display:flex;gap:6px;margin-bottom:6px}.problem-chip{padding:4px 8px;border:3px solid var(--ink);border-radius:999px;background:white;font-size:12px;font-weight:1000}.problem-chip.active{background:#def5e4}@media(max-width:800px){.modePanel{grid-template-columns:1fr}.graphWrap svg{height:150px}}
+.subjectPanel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.subjectBtn{min-height:54px;border:4px solid var(--ink);border-radius:10px;background:white;box-shadow:0 4px 0 var(--ink);font-weight:1000;cursor:pointer}
+.subjectBtn.selected{background:#d9f4e2}.subjectBtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.subjectHelp{margin-top:4px;font-size:13px;font-weight:900}
+.frontcar .gameDoor205 .leaf205{transition-property:transform;transition-duration:.92s;transition-timing-function:cubic-bezier(.22,.72,.25,1)}
+.frontcar .gameDoor205 .leaf205.left{transition-delay:.025s}.frontcar .gameDoor205 .leaf205.right{transition-delay:.055s}
+.frontcar.door-closing .gameDoor205 .leaf205{transition-duration:.82s;transition-timing-function:cubic-bezier(.42,0,.35,1)}
+.frontcar.door-closing .gameDoor205 .leaf205.left{transition-delay:.045s}.frontcar.door-closing .gameDoor205 .leaf205.right{transition-delay:0s}
+.frontcar.open .gameDoor205 .leaf205.left{transform:translateX(-112%)}
