@@ -118,10 +118,6 @@
       ]);
       return{kind:'angle',worksheet:true,template:'gap',...q,title:'📐 ○の角を見つけよう',prompt:'○の角度は何度？',hint:`一直線は180°。${q.a}° と ${q.b}° を先に足して、180°から引こう。`};
     }
-    const type=pick(['gap','around','gap']);
-    if(type==='around'){
-      return{kind:'angle',worksheet:true,template:'around',answer:165,title:'📐 三角定規パズル',prompt:'○の角度は何度？',hint:'一周は360°。見えている45°・60°・90°を全部足して、360°から引こう。'};
-    }
     const q=pick([
       {a:30,b:60,answer:90},
       {a:45,b:60,answer:75},
