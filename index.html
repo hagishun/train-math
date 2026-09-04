@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>けいさんでんしゃ プロトタイプ</title>
+<style>
+  :root{
+    --ink:#1f2b3a;
+    --sky:#bde8ff;
+    --platform:#d6d6d6;
+    --rail:#666;
+    --train:#d9dde2;
+    --stripe:#00a7d8;
+    --door:#20252b;
+    --open:#49c15e;
+    --gold:#ffd54d;
+    --good:#daf8df;
+    --warn:#fff1c9;
+    --panel:#fffdf5;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;width:100%;height:100%;
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+    color:var(--ink);background:#eef5fb;
+  }
+  body{overflow:hidden}
+  button{font:inherit;color:inherit;touch-action:manipulation}
+  .app{
+    width:100%;height:100dvh;display:flex;flex-direction:column;gap:8px;
+    padding:8px max(8px, env(safe-area-inset-right)) 8px max(8px, env(safe-area-inset-left));
+  }
+  .topbar{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:8px}
+  .box{
+    border:4px solid var(--ink);border-radius:12px;background:var(--panel);
+    box-shadow:0 5px 0 var(--ink);padding:10px 14px;font-weight:1000;
+  }
+  .title{font-size:clamp(20px,3vw,34px)}
+  .small{font-size:clamp(15px,2vw,22px)}
+  .route{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .station-dot{
+    width:20px;height:20px;border-radius:50%;border:3px solid var(--ink);background:white;
+  }
+  .station-dot.done{background:var(--open)}
+  .station-dot.now{background:var(--gold)}
+  .station-name{font-size:clamp(15px,2vw,21px)}
+  .scene{
+    position:relative;flex:1 1 auto;min-height:360px;border:4px solid var(--ink);
+    border-radius:16px;overflow:hidden;
+    background:linear-gradient(to bottom, #a9e0ff 0 56%, #f4fbff 56% 60%, var(--platform) 60% 76%, #8f8f8f 76% 100%);
+    box-shadow:0 6px 0 var(--ink);
+  }
+  .signboard{
+    position:absolute;top:10px;left:10px;min-width:220px;padding:8px 12px;
+    border:4px solid var(--ink);border-radius:10px;background:#20252b;color:#ffd84e;
+    font-weight:1000;font-size:clamp(22px,3vw,36px);z-index:3;
+  }
+  .status-banner{
+    position:absolute;top:10px;right:10px;padding:8px 12px;border:4px solid var(--ink);
+    border-radius:10px;background:white;font-weight:1000;font-size:clamp(14px,1.8vw,22px);z-index:3;
+  }
+  .platform-line{position:absolute;left:0;right:0;top:69%;height:10px;background:#ead600}
+  .station-pillars{
+    position:absolute;left:0;right:0;top:61%;display:flex;justify-content:space-around;z-index:1;
+  }
+  .pillar{width:18px;height:90px;background:#b3b3b3;border:3px solid #8d8d8d}
+  .cloud{position:absolute;background:white;opacity:.9;z-index:0}
+  .cloud.c1{width:90px;height:26px;left:13%;top:14%}
+  .cloud.c1:before,.cloud.c1:after,.cloud.c2:before,.cloud.c2:after{content:"";position:absolute;background:white}
+  .cloud.c1:before{width:28px;height:20px;left:18px;top:-14px}
+  .cloud.c1:after{width:25px;height:16px;right:14px;top:-10px}
+  .cloud.c2{width:110px;height:28px;right:10%;top:20%}
+  .cloud.c2:before{width:34px;height:22px;left:22px;top:-16px}
+  .cloud.c2:after{width:28px;height:16px;right:18px;top:-11px}
+  .train{
+    position:absolute;left:-52%;bottom:25%;width:52%;max-width:520px;min-width:360px;height:190px;
+    transition:left 1.8s cubic-bezier(.22,.8,.22,1);z-index:2;
+  }
+  .train.arrived{left:23%}
+  .train.departing{left:118%}
+  .car{
+    position:absolute;inset:0;border:4px solid var(--ink);border-radius:10px 10px 6px 6px;
+    background:var(--train);box-shadow:0 8px 0 rgba(0,0,0,.12);overflow:hidden;
+  }
+  .roofline{position:absolute;left:0;right:0;top:0;height:12px;background:#80d7eb}
+  .stripe{position:absolute;left:0;right:0;top:72px;height:22px;background:var(--stripe)}
+  .window{position:absolute;top:24px;width:78px;height:36px;border:4px solid var(--ink);background:#dff5ff}
+  .w1{left:22px}.w2{left:112px}.w3{right:112px}.w4{right:22px}
+  .doorway{
+    position:absolute;
+    top:14px;
+    left:196px;
+    width:184px;
+    height:132px;
+    border:4px solid var(--ink);
+    background:#15191e;
+    overflow:hidden;
+    z-index:5;
+  }
+  .door-interior{
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(to bottom,#242b33 0 68%,#5a6067 68% 82%,#e5c928 82% 88%,#363b40 88% 100%);
+  }
+  .door-interior:before,
+  .door-interior:after{
+    content:"";
+    position:absolute;
+    top:12px;
+    width:24px;
+    height:46px;
+    border:3px solid #aeb8c1;
+    border-radius:4px;
+    background:#3e4954;
+  }
+  .door-interior:before{left:22px}
+  .door-interior:after{right:22px}
+  .door-leaf{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:50%;
+    background:linear-gradient(to bottom,#ffffff,#e5e8eb);
+    transition:transform .9s cubic-bezier(.4,0,.2,1);
+    z-index:3;
+  }
+  .door-left-leaf{
+    left:0;
+    border-right:2px solid var(--ink);
+  }
+  .door-right-leaf{
+    right:0;
+    border-left:2px solid var(--ink);
+  }
+  .train.doors-open .door-left-leaf{transform:translateX(-96%)}
+  .train.doors-open .door-right-leaf{transform:translateX(96%)}
+  .door-window{
+    position:absolute;
+    top:18px;
+    left:14px;
+    width:50px;
+    height:38px;
+    border:3px solid var(--ink);
+    background:#dff5ff;
+  }
+  .door-right-leaf .door-window{left:16px}
+  .door-center-line{
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width:4px;
+    transform:translateX(-2px);
+    background:var(--ink);
+    z-index:6;
+    transition:opacity .2s;
+  }
+  .train.doors-open .door-center-line{opacity:0}
+  .door-open-sign{
+    position:absolute;
+    left:50%;
+    bottom:8px;
+    transform:translateX(-50%);
+    padding:3px 7px;
+    border:2px solid #fff;
+    border-radius:5px;
+    background:#1b7d38;
+    color:#fff;
+    font-size:13px;
+    font-weight:1000;
+    opacity:0;
+    transition:opacity .35s .55s;
+    z-index:2;
+    white-space:nowrap;
+  }
+  .train.doors-open .door-open-sign{opacity:1}
+  .train.doors-open .doorway{
+    box-shadow:
+      0 0 0 7px #ffe35b,
+      0 0 24px 10px rgba(255,227,91,.85);
+  }
+  .wheel{
+    position:absolute;bottom:8px;width:32px;height:32px;border-radius:50%;
+    border:5px solid var(--ink);background:#444;
+  }
+  .wh1{left:105px}.wh2{right:105px}
+  .track{
+    position:absolute;left:0;right:0;bottom:10%;height:46px;
+    background:
+      repeating-linear-gradient(to right, transparent 0 24px, #4f4f4f 24px 34px, transparent 34px 62px),
+      linear-gradient(to bottom, #6d6d6d 0 8px, transparent 8px 38px, #6d6d6d 38px 46px);
+  }
+  .passenger{
+    position:absolute;bottom:25%;left:58%;width:50px;height:94px;opacity:0;
+    transition:left .7s ease, opacity .3s ease;z-index:4;
+  }
+  .passenger.show{opacity:1}
+  .passenger.boarding{left:50%}
+  .passenger .head{width:28px;height:28px;border-radius:50%;background:#f3c48d;border:4px solid var(--ink);margin:0 auto}
+  .passenger .body{width:40px;height:42px;background:#ff9640;border:4px solid var(--ink);margin:4px auto 0}
+  .passenger .legs{width:38px;height:16px;border-bottom:4px solid var(--ink);margin:0 auto}
+  .qa-panel{display:grid;grid-template-columns:1.5fr 1fr;gap:8px;flex:0 0 auto}
+  .mission{min-height:150px}
+  .mission h2{margin:0 0 6px;font-size:clamp(18px,2.3vw,28px)}
+  .big{font-size:clamp(32px,6vw,60px);font-weight:1000;text-align:center;margin:8px 0 10px}
+  .sub{min-height:30px;font-size:clamp(14px,1.9vw,22px);font-weight:1000}
+  .feedback{
+    margin-top:8px;min-height:38px;padding:8px 10px;border:3px solid transparent;border-radius:10px;
+    font-size:clamp(13px,1.7vw,20px);font-weight:1000;
+  }
+  .feedback.good{background:var(--good);border-color:#53b862}
+  .feedback.warn{background:var(--warn);border-color:#e0b64f}
+  .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;align-content:start}
+  .choice{
+    min-height:64px;border:4px solid var(--ink);border-radius:12px;background:white;
+    box-shadow:0 5px 0 var(--ink);font-size:clamp(26px,4vw,42px);font-weight:1000;cursor:pointer;
+  }
+  .choice:active:not(:disabled){transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
+  .choice:disabled{opacity:.68;cursor:default}
+  .controls{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .control{
+    min-height:48px;border:4px solid var(--ink);border-radius:12px;background:white;
+    box-shadow:0 5px 0 var(--ink);font-weight:1000;font-size:clamp(14px,1.8vw,20px);cursor:pointer;
+  }
+  .control.primary{background:#6cdc8b}
+  .control.yellow{background:#ffe17c}
+  .control.pink{background:#ffd7e6}
+  .control:active:not(:disabled){transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
+  .control:disabled{opacity:.55;cursor:default}
+  .celebration{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(22,32,40,.65);padding:20px;z-index:10;
+  }
+  .celebration.show{display:flex}
+  .celebration-card{
+    width:min(540px,92vw);padding:26px;border:4px solid var(--ink);border-radius:18px;
+    background:white;box-shadow:0 7px 0 var(--ink);text-align:center;
+  }
+  .celebration-card h2{margin:0 0 10px;font-size:clamp(30px,6vw,56px)}
+  .celebration-card p{margin:10px 0;font-size:clamp(17px,3vw,26px);font-weight:1000}
+  @media (max-width: 860px), (orientation:portrait){
+    body{overflow:auto}
+    .app{height:auto;min-height:100dvh}
+    .topbar{grid-template-columns:1fr}
+    .qa-panel{grid-template-columns:1fr}
+    .train{min-width:320px;height:165px}
+    .train.arrived{left:8%}
+    .doorway{left:155px;top:12px;width:150px;height:118px}
+    .door-window{left:8px;width:48px}
+    .door-right-leaf .door-window{left:12px}
+    .window{width:62px}
+    .w1{left:16px}.w2{left:90px}.w3{right:90px}.w4{right:16px}
+    .passenger{left:72%}.passenger.boarding{left:50%}
+    .controls{grid-template-columns:1fr}
+  }
+
+  .train.moving .wheel{animation:wheelSpin .45s linear infinite}
+  .train.braking{animation:brakeRock .45s ease}
+  .train.door-closing{animation:doorCloseShake .42s ease}
+  .door-lamp{
+    position:absolute;
+    top:3px;
+    left:50%;
+    transform:translateX(-50%);
+    width:30px;
+    height:8px;
+    border:2px solid var(--ink);
+    background:#555;
+    z-index:8;
+  }
+  .train.doors-open .door-lamp{background:#ff5b5b;animation:lampBlink .5s infinite alternate;z-index:8}
+  .motion-lines{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:0;
+    z-index:1;
+    background:repeating-linear-gradient(
+      to right,
+      transparent 0 54px,
+      rgba(255,255,255,.72) 54px 90px,
+      transparent 90px 150px
+    );
+  }
+  .scene.train-moving .motion-lines{opacity:.8;animation:motionFlow .6s linear infinite}
+  .event-message{
+    position:absolute;
+    left:50%;
+    bottom:9px;
+    transform:translateX(-50%);
+    z-index:6;
+    min-width:min(520px,90%);
+    padding:8px 14px;
+    border:4px solid var(--ink);
+    border-radius:10px;
+    background:rgba(255,253,245,.95);
+    box-shadow:0 4px 0 var(--ink);
+    text-align:center;
+    font-weight:1000;
+    font-size:clamp(16px,2.3vw,26px);
+  }
+  @keyframes wheelSpin{to{transform:rotate(360deg)}}
+  @keyframes brakeRock{
+    0%{transform:translateX(0)}
+    35%{transform:translateX(10px)}
+    65%{transform:translateX(-5px)}
+    100%{transform:translateX(0)}
+  }
+  @keyframes doorCloseShake{
+    30%{transform:translateX(-3px)}
+    65%{transform:translateX(3px)}
+    100%{transform:translateX(0)}
+  }
+  @keyframes lampBlink{from{opacity:.35}to{opacity:1}}
+  @keyframes motionFlow{to{background-position:150px 0}}
+
+</style>
+</head>
+<body>
+<main class="app">
+  <section class="topbar">
+    <div class="box title">🚃 京浜東北線 けいさんミッション</div>
+    <div class="box small">いまの駅：<span id="currentStationLabel">おおみや</span></div>
+    <div class="box small">クリア駅：<span id="clearCount">0</span> / <span id="totalCount">4</span></div>
+  </section>
+
+  <section class="box route small">
+    <strong>路線図：</strong>
+    <div id="routeMap" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;"></div>
+  </section>
+
+  <section id="scene" class="scene">
+    <div class="motion-lines"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="signboard" id="stationSign">おおみや</div>
+    <div class="status-banner" id="statusBanner">まもなく 到着</div>
+    <div class="platform-line"></div>
+    <div class="station-pillars">
+      <div class="pillar"></div><div class="pillar"></div><div class="pillar"></div>
+      <div class="pillar"></div><div class="pillar"></div>
+    </div>
+    <div class="track"></div>
+
+    <div id="train" class="train">
+      <div class="car">
+        <div class="roofline"></div>
+        <div class="window w1"></div>
+        <div class="window w2"></div>
+        <div class="window w3"></div>
+        <div class="window w4"></div>
+        <div class="stripe"></div>
+        <div class="doorway">
+          <div class="door-interior"></div>
+          <div class="door-open-sign">のれます</div>
+          <div class="door-leaf door-left-leaf"><div class="door-window"></div></div>
+          <div class="door-leaf door-right-leaf"><div class="door-window"></div></div>
+          <div class="door-center-line"></div>
+          <div class="door-lamp"></div>
+        </div>
+        <div class="wheel wh1"></div>
+        <div class="wheel wh2"></div>
+      </div>
+    </div>
+
+    <div id="passenger" class="passenger">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+    </div>
+      <div id="eventMessage" class="event-message">スタートを押すと電車が入ってくるよ</div>
+  </section>
+
+  <section class="qa-panel">
+    <article class="box mission">
+      <h2 id="missionTitle">駅についたら問題が出るよ</h2>
+      <div id="problemText" class="big">しばらくまってね</div>
+      <div id="instruction" class="sub">電車がホームに入ると、ドアを開ける問題が出ます。</div>
+      <div id="feedback" class="feedback">スタートを押してね。</div>
+    </article>
+    <article class="choices" id="choices"></article>
+  </section>
+
+  <section class="controls">
+    <button id="startBtn" class="control primary">▶ スタート</button>
+    <button id="hintBtn" class="control yellow">💡 ヒント</button>
+    <button id="soundBtn" class="control">🔊 音あり</button>
+    <button id="doorTestBtn" class="control">🚪 ドア確認</button>
+    <button id="resetBtn" class="control pink">↩ さいしょから</button>
+  </section>
+</main>
+
+<div id="celebration" class="celebration">
+  <div class="celebration-card">
+    <h2>🎉 終点！</h2>
+    <p>ぜんぶの駅をクリア！</p>
+    <p>またのってみよう！</p>
+    <button id="closeCelebration" class="control primary" style="width:100%;max-width:260px;">もう一回あそぶ</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+var stations = ["おおみや", "あかばね", "うえの", "とうきょう", "しながわ", "かわさき", "よこはま"];
+var currentStation = 0;
+var phase = "idle";
+var currentProblem = null;
+var clearStations = 0;
+var lastProblemType = "";
+
+var train = document.getElementById("train");
+var passenger = document.getElementById("passenger");
+var stationSign = document.getElementById("stationSign");
+var statusBanner = document.getElementById("statusBanner");
+var missionTitle = document.getElementById("missionTitle");
+var problemText = document.getElementById("problemText");
+var instruction = document.getElementById("instruction");
+var feedback = document.getElementById("feedback");
+var choices = document.getElementById("choices");
+var startBtn = document.getElementById("startBtn");
+var hintBtn = document.getElementById("hintBtn");
+var resetBtn = document.getElementById("resetBtn");
+var currentStationLabel = document.getElementById("currentStationLabel");
+var clearCount = document.getElementById("clearCount");
+var totalCount = document.getElementById("totalCount");
+var routeMap = document.getElementById("routeMap");
+var celebration = document.getElementById("celebration");
+var scene = document.getElementById("scene");
+var eventMessage = document.getElementById("eventMessage");
+var soundBtn = document.getElementById("soundBtn");
+var doorTestBtn = document.getElementById("doorTestBtn");
+var audioContext = null;
+var soundEnabled = true;
+
+totalCount.textContent = String(stations.length);
+
+function ensureAudio(){
+  if(!audioContext){
+    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(AudioCtx){ audioContext = new AudioCtx(); }
+  }
+  if(audioContext && audioContext.state === "suspended"){ audioContext.resume(); }
+}
+function tone(freq, start, duration, volume, type){
+  if(!soundEnabled || !audioContext){ return; }
+  var osc = audioContext.createOscillator();
+  var gain = audioContext.createGain();
+  osc.type = type || "sine";
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, audioContext.currentTime + start);
+  gain.gain.exponentialRampToValueAtTime(volume || 0.12, audioContext.currentTime + start + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + start + duration);
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+  osc.start(audioContext.currentTime + start);
+  osc.stop(audioContext.currentTime + start + duration + 0.03);
+}
+function arrivalSound(){
+  ensureAudio();
+  tone(523.25,0,.28,.10,"sine");
+  tone(659.25,.22,.28,.10,"sine");
+  tone(783.99,.44,.40,.11,"sine");
+  tone(659.25,.76,.28,.08,"sine");
+}
+function doorOpenSound(){
+  ensureAudio();
+  tone(880,0,.12,.09,"square");
+  tone(1174.66,.16,.16,.08,"square");
+}
+function doorCloseSound(){
+  ensureAudio();
+  tone(1174.66,0,.13,.09,"square");
+  tone(880,.17,.18,.08,"square");
+}
+function departureSound(){
+  ensureAudio();
+  tone(659.25,0,.25,.09,"sine");
+  tone(783.99,.20,.25,.09,"sine");
+  tone(987.77,.40,.35,.10,"sine");
+  tone(1318.51,.70,.48,.11,"sine");
+}
+
+function shuffle(array){
+  var copy = array.slice();
+  for(var i = copy.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = copy[i]; copy[i] = copy[j]; copy[j] = t;
+  }
+  return copy;
+}
+function randomInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function buildRouteMap(){
+  routeMap.innerHTML = "";
+  for(var i=0;i<stations.length;i++){
+    var wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.alignItems = "center";
+    wrap.style.gap = "8px";
+
+    var dot = document.createElement("div");
+    dot.className = "station-dot";
+    if(i < currentStation){ dot.classList.add("done"); }
+    if(i === currentStation && phase !== "finished"){ dot.classList.add("now"); }
+
+    var name = document.createElement("div");
+    name.className = "station-name";
+    name.textContent = stations[i];
+
+    wrap.appendChild(dot); wrap.appendChild(name); routeMap.appendChild(wrap);
+
+    if(i < stations.length - 1){
+      var line = document.createElement("div");
+      line.textContent = "→"; line.style.fontWeight = "1000"; line.style.marginRight = "4px";
+      routeMap.appendChild(line);
+    }
+  }
+}
+function setFeedback(text, type){
+  feedback.textContent = text;
+  feedback.className = "feedback";
+  if(type === "good"){ feedback.classList.add("good"); }
+  if(type === "warn"){ feedback.classList.add("warn"); }
+}
+function makeProblem(){
+  var type;
+  if(lastProblemType === "×"){ type = "÷"; }
+  else if(lastProblemType === "÷"){ type = "×"; }
+  else { type = Math.random() < 0.5 ? "×" : "÷"; }
+
+  var a, b, answer, text, hint;
+  if(type === "×"){
+    a = randomInt(2, 9); b = randomInt(2, 9); answer = a * b;
+    text = a + " × " + b;
+    hint = a + "を" + b + "回 たすと？";
+  }else{
+    b = randomInt(2, 9); answer = randomInt(2, 9); a = b * answer;
+    text = a + " ÷ " + b;
+    hint = b + "のだんで " + a + " になるのは？";
+  }
+
+  var values = [answer], delta = 1;
+  while(values.length < 4){
+    var candidates = [answer - delta, answer + delta, answer + delta + 1, answer - delta - 1];
+    for(var i=0;i<candidates.length && values.length < 4;i++){
+      var v = candidates[i];
+      if(v > 0 && values.indexOf(v) === -1){ values.push(v); }
+    }
+    delta++;
+  }
+  lastProblemType = type;
+  return { type:type, text:text, answer:answer, choices:shuffle(values), hint:hint };
+}
+function renderProblem(){
+  currentProblem = makeProblem();
+  problemText.textContent = currentProblem.text;
+  choices.innerHTML = "";
+  for(var i=0;i<currentProblem.choices.length;i++){
+    var btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = String(currentProblem.choices[i]);
+    btn.setAttribute("type","button");
+    btn.dataset.value = String(currentProblem.choices[i]);
+    btn.addEventListener("click", onChoice);
+    choices.appendChild(btn);
+  }
+}
+function disableChoices(){
+  var btns = choices.querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){ btns[i].disabled = true; }
+}
+function onChoice(event){
+  var value = Number(event.currentTarget.dataset.value);
+  if(!currentProblem){ return; }
+  if(value === currentProblem.answer){
+    disableChoices();
+    event.currentTarget.style.background = "#dffff0";
+    event.currentTarget.style.borderColor = "#49a55c";
+    handleCorrect();
+  }else{
+    event.currentTarget.disabled = true;
+    setFeedback("おしい！ もう一度考えてみよう。", "warn");
+  }
+}
+function updateStationTexts(){
+  stationSign.textContent = stations[currentStation];
+  currentStationLabel.textContent = stations[currentStation];
+  clearCount.textContent = String(clearStations);
+  buildRouteMap();
+}
+function startArrival(){
+  phase = "arriving";
+  updateStationTexts();
+  missionTitle.textContent = "電車が入ってくるよ！";
+  problemText.textContent = stations[currentStation];
+  instruction.textContent = "京浜東北線がホームに到着します。";
+  choices.innerHTML = "";
+  statusBanner.textContent = "まもなく 到着";
+  setFeedback("電車の動きを見てね。", "");
+  eventMessage.textContent = "まもなく " + stations[currentStation] + " 駅に到着";
+
+  train.classList.remove("departing", "arrived", "doors-open", "braking", "door-closing");
+  train.style.transition = "none";
+  train.style.left = "-52%";
+  void train.offsetWidth;
+  train.style.left = "";
+  train.style.transition = "";
+  train.classList.add("moving");
+  scene.classList.add("train-moving");
+  passenger.classList.remove("show", "boarding");
+  void train.offsetWidth;
+  train.classList.add("arrived");
+
+  setTimeout(function(){
+    train.classList.remove("moving");
+    train.classList.add("braking");
+    scene.classList.remove("train-moving");
+    arrivalSound();
+    statusBanner.textContent = "到着";
+    eventMessage.textContent = stations[currentStation] + " 駅に到着！";
+  }, 1500);
+
+  setTimeout(function(){
+    phase = "open-question";
+    statusBanner.textContent = "停車中";
+    missionTitle.textContent = "電車が止まりました。問題を解こう！";
+    instruction.textContent = "正解するとドアが開いて、のれるよ。";
+    renderProblem();
+    setFeedback("ドアを開ける問題だ！", "");
+    eventMessage.textContent = "停車完了。正解するとドアが開きます";
+  }, 2450);
+}
+function handleCorrect(){
+  if(phase === "open-question"){
+    doorOpenSound();
+    eventMessage.textContent = "ドアが開きます";
+    train.classList.add("doors-open");
+    missionTitle.textContent = "ドアが開いた！";
+    instruction.textContent = "のれた！ つぎは、発車するための問題。";
+    statusBanner.textContent = "ドアひらく";
+    setFeedback("せいかい！ ドアが開きます。よく見てね！", "good");
+    choices.innerHTML = "";
+    problemText.textContent = "ドア開";
+
+    passenger.classList.add("show");
+    setTimeout(function(){ passenger.classList.add("boarding"); }, 100);
+
+    setTimeout(function(){
+      phase = "depart-question";
+      missionTitle.textContent = "問題2：もう1問で発車";
+      instruction.textContent = "もう一度正解するとドアが閉まって発車！";
+      statusBanner.textContent = "乗車完了";
+      renderProblem();
+      setFeedback("もう1問正解すると、ドアが閉まって発車するよ。", "");
+      eventMessage.textContent = "乗車完了。発車問題に挑戦！";
+    }, 3000);
+
+  }else if(phase === "depart-question"){
+    doorCloseSound();
+    eventMessage.textContent = "ドアが閉まります";
+    train.classList.add("door-closing");
+    train.classList.remove("doors-open");
+    missionTitle.textContent = "ドアが閉まる！";
+    instruction.textContent = "ベルが鳴って、次の駅へ出発するよ。";
+    statusBanner.textContent = "ドアしめ";
+    setFeedback("せいかい！ ドアが閉まります。よく見てね！", "good");
+    choices.innerHTML = "";
+    problemText.textContent = "ドア閉";
+
+    setTimeout(function(){
+      departureSound();
+      eventMessage.textContent = "発車します！";
+      phase = "departing";
+      statusBanner.textContent = "発車";
+      missionTitle.textContent = "発車！";
+      problemText.textContent = "🚃";
+      instruction.textContent = "つぎの駅へ向かっています。";
+      choices.innerHTML = "";
+      train.classList.remove("arrived", "door-closing", "braking");
+      train.classList.add("moving", "departing");
+      scene.classList.add("train-moving");
+
+      setTimeout(function(){
+        clearStations += 1;
+        clearCount.textContent = String(clearStations);
+
+        if(currentStation >= stations.length - 1){
+          phase = "finished";
+          statusBanner.textContent = "終点";
+          missionTitle.textContent = "おしまい！";
+          problemText.textContent = "ぜんぶクリア！";
+          instruction.textContent = "また最初からあそべるよ。";
+          setFeedback("すべての駅をクリアした！", "good");
+          celebration.classList.add("show");
+          buildRouteMap();
+          return;
+        }
+
+        currentStation += 1;
+        train.classList.remove("departing", "moving", "arrived");
+        train.style.left = "";
+        train.style.transition = "";
+
+        passenger.classList.remove("show", "boarding");
+        startArrival();
+      }, 2100);
+    }, 2000);
+  }
+}
+function showHint(){
+  if(!currentProblem){
+    setFeedback("駅についてから問題が出るよ。", "warn");
+    return;
+  }
+  setFeedback("ヒント： " + currentProblem.hint, "warn");
+}
+function resetGame(){
+  currentStation = 0; clearStations = 0; phase = "idle"; currentProblem = null; lastProblemType = "";
+  celebration.classList.remove("show");
+  train.className = "train";
+  scene.classList.remove("train-moving");
+  eventMessage.textContent = "スタートを押すと電車が入ってくるよ";
+  passenger.className = "passenger";
+  train.style.left = "-52%";
+  stationSign.textContent = stations[0];
+  currentStationLabel.textContent = stations[0];
+  statusBanner.textContent = "まもなく 到着";
+  missionTitle.textContent = "駅についたら問題が出るよ";
+  problemText.textContent = "しばらくまってね";
+  instruction.textContent = "電車がホームに入ると、ドアを開ける問題が出ます。";
+  choices.innerHTML = "";
+  clearCount.textContent = "0";
+  setFeedback("スタートを押してね。", "");
+  buildRouteMap();
+}
+startBtn.addEventListener("click", function(){
+  ensureAudio();
+  if(phase === "idle"){ startArrival(); }
+  else if(phase === "finished"){ resetGame(); startArrival(); }
+});
+hintBtn.addEventListener("click", showHint);
+soundBtn.addEventListener("click", function(){
+  ensureAudio();
+  soundEnabled = !soundEnabled;
+  soundBtn.textContent = soundEnabled ? "🔊 音あり" : "🔇 音なし";
+});
+doorTestBtn.addEventListener("click", function(){
+  ensureAudio();
+  train.style.left = "";
+  train.classList.remove("departing", "moving");
+  train.classList.add("arrived");
+  scene.classList.remove("train-moving");
+  if(train.classList.contains("doors-open")){
+    doorCloseSound();
+    train.classList.remove("doors-open");
+    eventMessage.textContent = "ドアが閉まりました";
+    doorTestBtn.textContent = "🚪 ドアを開く";
+  }else{
+    doorOpenSound();
+    train.classList.add("doors-open");
+    eventMessage.textContent = "ドアが開きました";
+    doorTestBtn.textContent = "🚪 ドアを閉じる";
+  }
+});
+resetBtn.addEventListener("click", resetGame);
+document.getElementById("closeCelebration").addEventListener("click", function(){
+  celebration.classList.remove("show");
+  resetGame();
+  startArrival();
+});
+resetGame();
+</script>
+</body>
+</html>
