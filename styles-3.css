@@ -1,0 +1,27 @@
+.frontcar.open .gameDoor205 .leaf205.right{transform:translateX(112%)}
+.doorCamera .camLeaf{transition-property:transform;transition-duration:.92s;transition-timing-function:cubic-bezier(.22,.72,.25,1)}
+.doorCamera .camLeaf.left{transition-delay:.025s}.doorCamera .camLeaf.right{transition-delay:.055s}
+.doorCamera.door-closing .camLeaf{transition-duration:.82s;transition-timing-function:cubic-bezier(.42,0,.35,1)}
+.doorCamera.door-closing .camLeaf.left{transition-delay:.045s}.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
+.doorCamera.open .camLeaf.left{transform:translateX(-112%)}.doorCamera.open .camLeaf.right{transform:translateX(112%)}
+.frontcar .gameDoor205 .leaf205.left::after,.frontcar .gameDoor205 .leaf205.right::after{content:"";position:absolute;top:0;bottom:0;width:2px;background:#4b5052}
+.frontcar .gameDoor205 .leaf205.left::after{right:0}.frontcar .gameDoor205 .leaf205.right::after{left:0}
+@media(max-width:800px){.subjectPanel{grid-template-columns:1fr}}
+.stationBackdrop{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.stationBackdrop .city{position:absolute;left:0;right:0;top:18%;height:32%;opacity:.72}
+.stationBackdrop .building{position:absolute;bottom:0;background:#d7e1e5;border:2px solid #82939b;box-shadow:inset 0 -10px 0 rgba(100,120,128,.08)}
+.stationBackdrop .bgTrack{position:absolute;left:0;right:0;top:49%;height:8px;background:#61686b;opacity:.7}
+.stationBackdrop .bgTrain{position:absolute;top:33%;height:64px;border:3px solid #5b666b;border-radius:7px 10px 5px 5px;background:#eef2f3;box-shadow:0 3px 0 rgba(0,0,0,.18);display:flex;align-items:center;padding:0 9px;gap:7px;font-size:12px;font-weight:1000;color:#26343a;animation:bgTrainPass 10s linear infinite}
+.stationBackdrop .bgTrain::before{content:"";position:absolute;left:0;right:0;top:34px;height:8px;background:var(--bgstripe,#4c8)}
+.stationBackdrop .bgWin{width:34px;height:22px;border:3px solid #506065;background:#23343b;border-radius:2px}
+.stationBackdrop .bgLabel{position:absolute;right:8px;top:5px;padding:2px 5px;border-radius:4px;background:rgba(255,255,255,.82)}
+@keyframes bgTrainPass{from{transform:translateX(120vw)}to{transform:translateX(-130vw)}}
+.stationBackdrop.shinkansen .bgTrain{width:330px;border-radius:42px 10px 8px 8px;--bgstripe:#2674cc;animation-duration:8s}
+.stationBackdrop.chuo .bgTrain{width:300px;--bgstripe:#ef7d22;animation-duration:9.5s}
+.stationBackdrop.hachiko .bgTrain.secondary{width:250px;top:40%;--bgstripe:#8da64a;animation-duration:12s;animation-delay:-5s}
+.stationBackdrop .bgTrain.secondary{animation-direction:reverse;opacity:.84}
+.frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.12s;transition-timing-function:cubic-bezier(.32,.02,.18,1)}
+.frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.28s}
+.frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
+.frontcar.door-sealed .gameDoor205,.doorCamera.door-sealed .camDoor{animation:doorSeal .16s ease-out}
+@keyframes doorSeal{0%{transform:translateX(0)}40%{transform:translateX(1px)}75%{transform:translateX(-.6px)}100%{transform:translateX(0)}}
