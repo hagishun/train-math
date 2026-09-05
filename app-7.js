@@ -146,3 +146,227 @@
     promptEl.textContent='運転スタートで、○の角を求める問題が出るよ。';
   }
 })();
+
+/* v21: 九九モード + 相模原かけ算チャレンジ + 205系ドア動作のリアル化 */
+(function(){
+  const subjectPanel=document.querySelector('.subjectPanel');
+  if(!subjectPanel)return;
+
+  const style=document.createElement('style');
+  style.textContent=`
+    .subjectPanel{grid-template-columns:repeat(5,minmax(0,1fr))}
+    .multiplyWrap{min-height:150px;border:3px solid var(--ink);border-radius:12px;background:linear-gradient(180deg,#fffdf4,#fff8d6);display:none;align-items:center;justify-content:center;padding:12px}
+    .multiplyExpr{font-size:clamp(34px,7vw,68px);font-weight:1000;letter-spacing:.04em;color:#21313a;text-align:center}
+    .multiplyNote{margin-top:8px;font-size:13px;font-weight:900;color:#52616b;text-align:center}
+    .frontcar .gameDoor205 .leaf205,.doorCamera .camLeaf{transition-duration:1.02s!important;transition-timing-function:cubic-bezier(.38,.02,.18,1)!important}
+    .frontcar.open .gameDoor205 .leaf205.left,.doorCamera.open .camLeaf.left{transition-delay:.02s!important}
+    .frontcar.open .gameDoor205 .leaf205.right,.doorCamera.open .camLeaf.right{transition-delay:.07s!important}
+    .frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.02s!important;transition-timing-function:cubic-bezier(.46,.01,.22,1)!important}
+    .frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.30s!important}
+    .frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s!important}
+    .frontcar.door-impact .gameDoor205,.doorCamera.door-impact .camDoor{animation:realDoorImpact .13s ease-out}
+    .frontcar.door-bounce .gameDoor205,.doorCamera.door-bounce .camDoor{animation:realDoorSettle .22s ease-out}
+    @keyframes realDoorImpact{0%{transform:translateX(0)}35%{transform:translateX(1.4px)}70%{transform:translateX(-.8px)}100%{transform:translateX(0)}}
+    @keyframes realDoorSettle{0%{transform:translateX(0)}45%{transform:translateX(-.6px)}100%{transform:translateX(0)}}
+    @media(max-width:1050px){.subjectPanel{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:800px){.subjectPanel{grid-template-columns:1fr}.multiplyWrap{min-height:120px}}
+  `;
+  document.head.appendChild(style);
+
+  let multiplyButton=subjectPanel.querySelector('[data-subject="multiply"]');
+  if(!multiplyButton){
+    multiplyButton=document.createElement('button');
+    multiplyButton.className='subjectBtn';
+    multiplyButton.dataset.subject='multiply';
+    multiplyButton.innerHTML='✖️ かけ算<div class="subjectHelp">九九＋相模原チャレンジ</div>';
+    const mixButton=subjectPanel.querySelector('[data-subject="mix"]');
+    subjectPanel.insertBefore(multiplyButton,mixButton||null);
+  }
+
+  const tabs=document.querySelector('.problem-tabs');
+  const multiplyChip=document.createElement('span');
+  multiplyChip.id='multiplyChip';
+  multiplyChip.className='problem-chip';
+  multiplyChip.textContent='✖️ かけ算';
+  tabs.appendChild(multiplyChip);
+
+  const diagramHost=angleDiagram.parentElement;
+  const multiplyDiagram=document.createElement('div');
+  multiplyDiagram.id='multiplyDiagram';
+  multiplyDiagram.className='multiplyWrap';
+  multiplyDiagram.innerHTML='<div><div id="multiplyExpr" class="multiplyExpr">3 × 8 = ?</div><div class="multiplyNote">数字をテンキーで入れてね</div></div>';
+  diagramHost.appendChild(multiplyDiagram);
+  const multiplyExpr=multiplyDiagram.querySelector('#multiplyExpr');
+
+  function setMultiplyView(expr='3 × 8 = ?'){
+    angleDiagram.style.display='none';
+    graphDiagram.style.display='none';
+    fractionDiagram.style.display='none';
+    multiplyDiagram.style.display='flex';
+    [angleChip,graphChip,fractionChip].forEach(chip=>chip&&chip.classList.remove('active'));
+    multiplyChip.classList.add('active');
+    answerUnit.textContent='';
+    multiplyExpr.textContent=expr;
+  }
+  function hideMultiplyView(){
+    multiplyDiagram.style.display='none';
+    multiplyChip.classList.remove('active');
+  }
+
+  multiplyButton.addEventListener('click',()=>{
+    if(phase!=='idle')return;
+    subjectMode='multiply';
+    document.querySelectorAll('.subjectBtn').forEach(b=>b.classList.toggle('selected',b===multiplyButton));
+    setMultiplyView();
+    missionTitle.textContent='✖️ 九九ミッション';
+    promptEl.textContent='ふだんは九九。相模原では難易度でチャレンジが変わるよ。';
+    feedback.className='feedback';
+    feedback.textContent='運転スタートを押してね。';
+  });
+
+  document.querySelectorAll('.subjectBtn').forEach(btn=>{
+    if(btn===multiplyButton)return;
+    btn.addEventListener('click',()=>{if(phase==='idle')hideMultiplyView()});
+  });
+  document.getElementById('resetBtn').addEventListener('click',()=>hideMultiplyView());
+
+  const rand=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  function makeMultiplyProblem(){
+    const isSag=stations[stationIndex]==='相模原';
+    let a,b,level='九九';
+    if(!isSag||difficulty==='easy'){
+      a=rand(2,9);b=rand(2,9);
+    }else if(difficulty==='normal'){
+      a=rand(10,15);b=rand(2,9);level='ちょいむず';
+    }else{
+      a=rand(11,25);b=rand(3,9);level='むずかしい';
+    }
+    const answer=a*b;
+    const challenge=isSag?`⭐ 相模原 ${level}かけ算チャレンジ`:'✖️ 九九ミッション';
+    const hint=a<=9
+      ?`${a}の段を思い出そう。${a}を${b}こ分だよ。`
+      :`${a}を 10 と ${a-10} に分けると、10×${b} と ${a-10}×${b} で考えられるよ。`;
+    return{kind:'multiply',a,b,answer,title:challenge,prompt:`${a} × ${b} はいくつ？`,hint};
+  }
+
+  const baseMakeProblem=makeProblem;
+  makeProblem=function(){
+    if(subjectMode==='multiply')return makeMultiplyProblem();
+    return baseMakeProblem();
+  };
+
+  const baseNewProblem=newProblem;
+  newProblem=function(){
+    if(subjectMode!=='multiply'){
+      hideMultiplyView();
+      return baseNewProblem();
+    }
+    input='';
+    answerText.textContent='＿';
+    feedback.className='feedback';
+    feedback.textContent='テンキーで答えを入れよう。';
+    currentProblem=makeProblem();
+    missionTitle.textContent=currentProblem.title;
+    promptEl.textContent=currentProblem.prompt;
+    setMultiplyView(`${currentProblem.a} × ${currentProblem.b} = ?`);
+    if(stations[stationIndex]==='相模原'){
+      challenge.classList.add('show');
+      setTimeout(()=>challenge.classList.remove('show'),1300);
+    }
+  };
+
+  let doorTimers=[];
+  function clearDoorTimers(){doorTimers.forEach(clearTimeout);doorTimers=[];}
+  function later(fn,ms){const id=setTimeout(fn,ms);doorTimers.push(id);return id;}
+
+  setDoorOpen=function(isOpen,animateClose=true){
+    clearDoorTimers();
+    frontCar.classList.remove('door-sealed','door-impact','door-bounce');
+    doorCamera.classList.remove('door-sealed','door-impact','door-bounce');
+    doorImpact.classList.remove('show');
+
+    if(isOpen){
+      frontCar.classList.remove('door-closing');
+      doorCamera.classList.remove('door-closing');
+      camState.textContent='UNLOCK';
+      pneumaticDoorSound();
+      later(()=>{
+        camState.textContent='OPENING';
+        frontCar.classList.add('open');
+        doorCamera.classList.add('open');
+      },150);
+      later(()=>{camState.textContent='OPEN';},1180);
+      return;
+    }
+
+    if(!animateClose){
+      frontCar.classList.remove('open','door-closing','door-impact','door-bounce','door-sealed');
+      doorCamera.classList.remove('open','door-closing','door-impact','door-bounce','door-sealed');
+      camState.textContent='CLOSED';
+      return;
+    }
+
+    camState.textContent='STANDBY';
+    later(()=>{
+      pneumaticDoorSound();
+      frontCar.classList.add('door-closing');
+      doorCamera.classList.add('door-closing');
+      camState.textContent='CLOSING';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        frontCar.classList.remove('open');
+        doorCamera.classList.remove('open');
+      }));
+    },140);
+    later(()=>{
+      doorImpactSound();
+      frontCar.classList.add('door-impact');
+      doorCamera.classList.add('door-impact');
+      doorImpact.classList.remove('show');
+      void doorImpact.offsetWidth;
+      doorImpact.classList.add('show');
+    },1490);
+    later(()=>{
+      frontCar.classList.remove('door-impact');
+      doorCamera.classList.remove('door-impact');
+      frontCar.classList.add('door-bounce');
+      doorCamera.classList.add('door-bounce');
+      camState.textContent='LOCK';
+    },1610);
+    later(()=>{
+      frontCar.classList.remove('door-bounce','door-closing');
+      doorCamera.classList.remove('door-bounce','door-closing');
+      frontCar.classList.add('door-sealed');
+      doorCamera.classList.add('door-sealed');
+      camState.textContent='CLOSED';
+    },1780);
+    later(()=>{
+      frontCar.classList.remove('door-sealed');
+      doorCamera.classList.remove('door-sealed');
+    },1980);
+  };
+
+  correct=function(){
+    correctSound();
+    feedback.className='feedback good';
+    feedback.textContent='正解！ドアが開きます。';
+    if(currentProblem.kind==='angle')drawAngle(currentProblem.answer,true);
+    setDoorOpen(true);
+    statusEl.textContent='ドア開';
+    if(stations[stationIndex]==='相模原')showSparkles();
+    setTimeout(()=>{
+      statusEl.textContent='♪ 発車メロディー';
+      feedback.textContent='♪ 発車メロディーが流れています';
+      const melodyMs=playDepartureMelody();
+      setTimeout(()=>{
+        setDoorOpen(false,true);
+        statusEl.textContent='ドア閉動作';
+        feedback.textContent='空気音と左右のドアの動きを見てね。';
+        setTimeout(()=>{
+          statusEl.textContent='ドア閉';
+          feedback.textContent='ドアが閉まりました。まもなく発車！';
+        },1980);
+        setTimeout(departurePass,2250);
+      },melodyMs);
+    },1200);
+  };
+})();
