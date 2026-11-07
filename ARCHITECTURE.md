@@ -7,7 +7,7 @@
 ```text
 index.html
 ├─ styles-1.css ... styles-4.css
-└─ app-1.js ... app-6.js
+└─ app-1.js ... app-7.js
 ```
 
 GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主要ゲーム処理はブラウザ内で完結します。
@@ -34,6 +34,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `makeAngleProblem()` : 角度問題
 - `makeGraphProblem()` : 折れ線グラフ問題
 - `makeFractionProblem()` : 分数問題
+- `makeMultiplyProblem()` : かけ算問題（`app-7.js`）
 - `makeProblem()` : 選択科目に応じた問題生成
 - `newProblem()` : 次の問題を画面へセット
 - `drawAngle()` / `drawLineGraph()` : 問題図の描画
@@ -47,6 +48,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `carStep()` : 1両分の寸法計算
 - `stoppedLeft()` / `offscreenLeft()` : 停車位置 / 画面外位置
 - `setConsistLeft()` : 編成全体の位置反映
+- `moving` クラスと `--wheel-period` : 車輪の回転を列車の移動・加速に同期
 - `updateStationBackground()` : 駅別背景の切替
 - `renderRoute()` : 路線表示の更新
 
@@ -118,3 +120,4 @@ newProblem()
 8. 駅別背景が正しく切り替わること。
 9. 速度計が車両や問題UIに重ならないこと。
 10. タッチ環境で操作不能な要素がないこと。
+11. 到着・発車中に車輪が回り、発車時は加速に合わせて回転が速くなること。
