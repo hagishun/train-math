@@ -1,8 +1,4 @@
 .frontcar.open .gameDoor205 .leaf205.right{transform:translateX(112%)}
-.doorCamera .camLeaf{transition-property:transform;transition-duration:.92s;transition-timing-function:cubic-bezier(.22,.72,.25,1)}
-.doorCamera .camLeaf.left{transition-delay:.025s}.doorCamera .camLeaf.right{transition-delay:.055s}
-.doorCamera.door-closing .camLeaf{transition-duration:.82s;transition-timing-function:cubic-bezier(.42,0,.35,1)}
-.doorCamera.door-closing .camLeaf.left{transition-delay:.045s}.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
 .doorCamera.open .camLeaf.left{transform:translateX(-112%)}.doorCamera.open .camLeaf.right{transform:translateX(112%)}
 .frontcar .gameDoor205 .leaf205.left::after,.frontcar .gameDoor205 .leaf205.right::after{content:"";position:absolute;top:0;bottom:0;width:2px;background:#4b5052}
 .frontcar .gameDoor205 .leaf205.left::after{right:0}.frontcar .gameDoor205 .leaf205.right::after{left:0}
@@ -20,8 +16,5 @@
 .stationBackdrop.chuo .bgTrain{width:300px;--bgstripe:#ef7d22;animation-duration:9.5s}
 .stationBackdrop.hachiko .bgTrain.secondary{width:250px;top:40%;--bgstripe:#8da64a;animation-duration:12s;animation-delay:-5s}
 .stationBackdrop .bgTrain.secondary{animation-direction:reverse;opacity:.84}
-.frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.12s;transition-timing-function:cubic-bezier(.32,.02,.18,1)}
-.frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.28s}
-.frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
 .frontcar.door-sealed .gameDoor205,.doorCamera.door-sealed .camDoor{animation:doorSeal .16s ease-out}
 @keyframes doorSeal{0%{transform:translateX(0)}40%{transform:translateX(1px)}75%{transform:translateX(-.6px)}100%{transform:translateX(0)}}

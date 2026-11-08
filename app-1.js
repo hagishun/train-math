@@ -86,26 +86,29 @@ function pneumaticDoorSound(){
   ensureAudio();
   if(!audioContext)return;
   const now=audioContext.currentTime;
-  const duration=.48;
+  const duration=.82;
   const buffer=audioContext.createBuffer(1,Math.floor(audioContext.sampleRate*duration),audioContext.sampleRate);
   const data=buffer.getChannelData(0);
   for(let i=0;i<data.length;i++){
     const t=i/data.length;
-    const env=Math.pow(1-t,1.7);
+    const env=Math.sin(Math.PI*t)*Math.pow(1-t,.25);
     data[i]=(Math.random()*2-1)*env;
   }
   const src=audioContext.createBufferSource();
-  const filter=audioContext.createBiquadFilter();
+  const highpass=audioContext.createBiquadFilter();
+  const lowpass=audioContext.createBiquadFilter();
   const gain=audioContext.createGain();
-  filter.type="bandpass";
-  filter.frequency.setValueAtTime(1500,now);
-  filter.Q.setValueAtTime(.65,now);
+  highpass.type="highpass";
+  highpass.frequency.setValueAtTime(260,now);
+  lowpass.type="lowpass";
+  lowpass.frequency.setValueAtTime(1900,now);
   gain.gain.setValueAtTime(.001,now);
-  gain.gain.linearRampToValueAtTime(.09,now+.035);
+  gain.gain.linearRampToValueAtTime(.055,now+.08);
   gain.gain.exponentialRampToValueAtTime(.001,now+duration);
   src.buffer=buffer;
-  src.connect(filter);
-  filter.connect(gain);
+  src.connect(highpass);
+  highpass.connect(lowpass);
+  lowpass.connect(gain);
   gain.connect(audioContext.destination);
   src.start(now);
 }
@@ -113,13 +116,13 @@ function doorImpactSound(){
   if(!soundEnabled || !audioContext)return;
   const now=audioContext.currentTime;
   const o=audioContext.createOscillator(),g=audioContext.createGain();
-  o.type="triangle";o.frequency.setValueAtTime(105,now);o.frequency.exponentialRampToValueAtTime(58,now+.16);
-  g.gain.setValueAtTime(.22,now);g.gain.exponentialRampToValueAtTime(.001,now+.2);
+  o.type="sine";o.frequency.setValueAtTime(92,now);o.frequency.exponentialRampToValueAtTime(54,now+.13);
+  g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.075,now+.008);g.gain.exponentialRampToValueAtTime(.001,now+.17);
   o.connect(g);g.connect(audioContext.destination);o.start(now);o.stop(now+.21);
   const o2=audioContext.createOscillator(),g2=audioContext.createGain();
-  o2.type="square";o2.frequency.setValueAtTime(210,now+.02);o2.frequency.exponentialRampToValueAtTime(120,now+.09);
-  g2.gain.setValueAtTime(.07,now+.02);g2.gain.exponentialRampToValueAtTime(.001,now+.12);
-  o2.connect(g2);g2.connect(audioContext.destination);o2.start(now+.02);o2.stop(now+.13);
+  o2.type="triangle";o2.frequency.setValueAtTime(520,now+.012);o2.frequency.exponentialRampToValueAtTime(240,now+.065);
+  g2.gain.setValueAtTime(.001,now+.012);g2.gain.linearRampToValueAtTime(.025,now+.018);g2.gain.exponentialRampToValueAtTime(.001,now+.09);
+  o2.connect(g2);g2.connect(audioContext.destination);o2.start(now+.012);o2.stop(now+.1);
 }
 function arrivalSound(){ensureAudio();tone(440,0,.18);tone(523,.2,.18);tone(659,.4,.35)}
 function playDepartureChime(){

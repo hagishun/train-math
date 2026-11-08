@@ -29,8 +29,4 @@
 .subjectPanel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .subjectBtn{min-height:54px;border:4px solid var(--ink);border-radius:10px;background:white;box-shadow:0 4px 0 var(--ink);font-weight:1000;cursor:pointer}
 .subjectBtn.selected{background:#d9f4e2}.subjectBtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.subjectHelp{margin-top:4px;font-size:13px;font-weight:900}
-.frontcar .gameDoor205 .leaf205{transition-property:transform;transition-duration:.92s;transition-timing-function:cubic-bezier(.22,.72,.25,1)}
-.frontcar .gameDoor205 .leaf205.left{transition-delay:.025s}.frontcar .gameDoor205 .leaf205.right{transition-delay:.055s}
-.frontcar.door-closing .gameDoor205 .leaf205{transition-duration:.82s;transition-timing-function:cubic-bezier(.42,0,.35,1)}
-.frontcar.door-closing .gameDoor205 .leaf205.left{transition-delay:.045s}.frontcar.door-closing .gameDoor205 .leaf205.right{transition-delay:0s}
 .frontcar.open .gameDoor205 .leaf205.left{transform:translateX(-112%)}
