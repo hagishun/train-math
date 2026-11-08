@@ -2,6 +2,12 @@
 const stations=["東神奈川","菊名","新横浜","小机","中山","長津田","町田","相模原","橋本","八王子"];
 let stationIndex=0,clearStations=0,phase="idle",input="",currentProblem=null,soundEnabled=true,audioContext=null,difficulty="easy",subjectMode="angle";
 const scene=document.getElementById("scene"),stationBackdrop=document.getElementById("stationBackdrop"),consist=document.getElementById("consist"),frontCar=document.getElementById("frontCar"),doorCamera=document.getElementById("doorCamera"),camState=document.getElementById("camState"),statusEl=document.getElementById("status"),stationSign=document.getElementById("stationSign"),currentStation=document.getElementById("currentStation"),clearCount=document.getElementById("clearCount"),routeMap=document.getElementById("routeMap"),missionTitle=document.getElementById("missionTitle"),promptEl=document.getElementById("prompt"),answerText=document.getElementById("answerText"),feedback=document.getElementById("feedback"),angleRay=document.getElementById("angleRay"),angleArc=document.getElementById("angleArc"),angleLabel=document.getElementById("angleLabel"),angleDiagram=document.getElementById("angleDiagram"),graphDiagram=document.getElementById("graphDiagram"),graphSvg=document.getElementById("graphSvg"),fractionDiagram=document.getElementById("fractionDiagram"),fractionExpr=document.getElementById("fractionExpr"),angleChip=document.getElementById("angleChip"),graphChip=document.getElementById("graphChip"),fractionChip=document.getElementById("fractionChip"),answerUnit=document.getElementById("answerUnit"),sparkles=document.getElementById("sparkles"),challenge=document.getElementById("challenge"),passCounter=document.getElementById("passCounter"),doorImpact=document.getElementById("doorImpact"),speedBars=document.getElementById("speedBars"),speedText=document.getElementById("speedText");
+const stationAnnouncements={
+  approach:new Audio("audio/approach-announcement.mp3"),
+  departure:new Audio("audio/departure-announcement.mp3")
+};
+Object.values(stationAnnouncements).forEach(audio=>{audio.preload="auto";audio.volume=.9});
+let activeStationAnnouncement=null;
 function ensureAudio(){if(!audioContext){const C=window.AudioContext||window.webkitAudioContext;if(C)audioContext=new C()}if(audioContext&&audioContext.state==="suspended")audioContext.resume()}
 function tone(freq,start,dur,vol=.07){if(!soundEnabled||!audioContext)return;const o=audioContext.createOscillator(),g=audioContext.createGain();o.type="sine";o.frequency.value=freq;g.gain.setValueAtTime(.0001,audioContext.currentTime+start);g.gain.exponentialRampToValueAtTime(vol,audioContext.currentTime+start+.02);g.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+start+dur);o.connect(g);g.connect(audioContext.destination);o.start(audioContext.currentTime+start);o.stop(audioContext.currentTime+start+dur+.03)}
 function setDoorOpen(isOpen,animateClose=true){
@@ -145,19 +151,55 @@ function playDepartureChime(){
     });
   });
 }
-function announceApproach(station){
-  if(!soundEnabled||!("speechSynthesis" in window))return;
-  window.speechSynthesis.cancel();
-  const announcement=new SpeechSynthesisUtterance("まもなく、1番線に電車がまいります。黄色い線までお下がりください。");
-  announcement.lang="ja-JP";
-  announcement.rate=1;
-  announcement.pitch=1;
-  const selectedVoice=document.getElementById("announcementVoice").value;
-  if(selectedVoice){
-    const japaneseVoice=window.speechSynthesis.getVoices().find(voice=>voice.voiceURI===selectedVoice);
-    if(japaneseVoice)announcement.voice=japaneseVoice;
+function stopStationAnnouncement(){
+  if(!activeStationAnnouncement)return;
+  activeStationAnnouncement.audio.pause();
+  activeStationAnnouncement.audio.currentTime=0;
+  activeStationAnnouncement.finish();
+}
+function unlockStationAnnouncement(kind){
+  if(!soundEnabled)return;
+  const audio=stationAnnouncements[kind];
+  audio.muted=true;
+  audio.currentTime=0;
+  const playback=audio.play();
+  if(!playback){
+    audio.pause();
+    audio.currentTime=0;
+    audio.muted=false;
+    return;
   }
-  window.speechSynthesis.speak(announcement);
+  playback.then(()=>{
+    audio.pause();
+    audio.currentTime=0;
+    audio.muted=false;
+  }).catch(error=>{
+    audio.muted=false;
+    console.error(`Failed to unlock ${kind} station announcement`,error);
+  });
+}
+function playStationAnnouncement(kind){
+  stopStationAnnouncement();
+  if(!soundEnabled)return Promise.resolve();
+  const audio=stationAnnouncements[kind];
+  return new Promise(resolve=>{
+    let finished=false;
+    const cleanup=()=>{audio.removeEventListener("ended",finish);audio.removeEventListener("error",onError);clearTimeout(timeout)};
+    const finish=()=>{if(finished)return;finished=true;cleanup();if(activeStationAnnouncement?.audio===audio)activeStationAnnouncement=null;resolve()};
+    const onError=()=>{console.error(`Failed to play ${kind} station announcement`,audio.error);if(phase!=="idle"){feedback.className="feedback warn";feedback.textContent="駅の放送を再生できませんでした。"}finish()};
+    const timeout=setTimeout(onError,15000);
+    activeStationAnnouncement={audio,finish};
+    audio.addEventListener("ended",finish,{once:true});
+    audio.addEventListener("error",onError,{once:true});
+    try{
+      audio.currentTime=0;
+      audio.play()?.catch(error=>{console.error(`Failed to play ${kind} station announcement`,error);if(phase!=="idle"){feedback.className="feedback warn";feedback.textContent="駅の放送を再生できませんでした。"}finish()});
+    }catch(error){
+      console.error(`Failed to play ${kind} station announcement`,error);
+      if(phase!=="idle"){feedback.className="feedback warn";feedback.textContent="駅の放送を再生できませんでした。"}
+      finish();
+    }
+  });
 }
 function correctSound(){ensureAudio();tone(660,0,.15);tone(880,.14,.2);tone(1100,.3,.23)}
 function departureSound(){
