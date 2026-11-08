@@ -1,12 +1,8 @@
 function playDepartureMelody(){
-  const variant=departureMelodyVariant%3;
-  departureMelodyVariant=(departureMelodyVariant+1)%3;
-  const melodies=[playOriginalDepartureMelody,playSpringBoxStyleMelody,playVerdeRayoStyleMelody];
-  const durations=[14000,13500,14600];
   const chimeDuration=1100;
   playDepartureChime();
-  setTimeout(melodies[variant],chimeDuration);
-  return durations[variant]+chimeDuration;
+  setTimeout(playStationReferenceStyleMelody,chimeDuration);
+  return 13000+chimeDuration;
 }
 consist.querySelectorAll(".car:not(.frontcar)").forEach(car=>{if(!car.querySelector(".d4")){const d=document.createElement("div");d.className="door d4";car.appendChild(d)}});
 function renderRoute(){routeMap.innerHTML="<strong>路線：</strong>";stations.forEach((n,i)=>{const w=document.createElement("span"),d=document.createElement("span"),l=document.createElement("span");w.className="stationNode";d.className="dot";if(i<stationIndex)d.classList.add("done");if(i===stationIndex&&phase!=="finished")d.classList.add("now");l.textContent=n;w.append(d,l);routeMap.append(w);if(i<stations.length-1){const a=document.createElement("span");a.className="arrow";a.textContent="→";routeMap.append(a)}})}

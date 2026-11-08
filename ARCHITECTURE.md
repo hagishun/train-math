@@ -23,7 +23,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `phase`: ゲーム進行状態
 - `difficulty`: 難易度
 - `subjectMode`: 科目
-- `departureMelodyVariant`: 発車メロディのローテーション番号
+- `departureMelodyVariant`: 旧3曲ローテーション用の番号（現在は未使用）
 - `currentProblem`: 現在の問題
 
 状態管理ライブラリは使用していません。
@@ -76,7 +76,9 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ
 - `playVerdeRayoStyleMelody()` : 第3メロディ
-- `playDepartureMelody()` : 3曲を順番に選択
+- `playGlassBellNote()` : 基音と6・8倍音を重ねたガラス風電子ベル音
+- `playStationReferenceStyleMelody()` : 参考録音の雰囲気に合わせたオリジナル旋律（13秒）
+- `playDepartureMelody()` : ベルの後に参考音源風メロディを再生（旧3曲は関数として残置）
 
 ## 4. イベントの基本フロー
 
@@ -127,7 +129,7 @@ newProblem()
 4. 接近放送終了後に入線し、正解 → ドア開 → 発車ベル・メロディ → 発車放送 → 閉扉 → 発車の順に進むこと。
 5. 到着時に戸当たり音や空気音が誤って鳴らないこと。
 6. ドアが閉まり切る前に列車が動かないこと。
-7. 3種類の発車メロディが順番に切り替わること。
+7. 発車メロディ（約13秒）が鳴り終わってから発車放送が始まること。
 8. 駅別背景が正しく切り替わること。
 9. 速度計が車両や問題UIに重ならないこと。
 10. タッチ環境で操作不能な要素がないこと。
