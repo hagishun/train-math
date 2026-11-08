@@ -112,12 +112,15 @@ function arrivalSound(){ensureAudio();tone(440,0,.18);tone(523,.2,.18);tone(659,
 function announceApproach(station){
   if(!soundEnabled||!("speechSynthesis" in window))return;
   window.speechSynthesis.cancel();
-  const announcement=new SpeechSynthesisUtterance(`まもなく、${station}駅です。黄色い線までお下がりください。`);
+  const announcement=new SpeechSynthesisUtterance("まもなく、1番線に電車がまいります。黄色い線までお下がりください。");
   announcement.lang="ja-JP";
-  announcement.rate=1.08;
-  announcement.volume=.85;
-  const japaneseVoice=window.speechSynthesis.getVoices().find(voice=>voice.lang.toLowerCase().startsWith("ja"));
-  if(japaneseVoice)announcement.voice=japaneseVoice;
+  announcement.rate=1;
+  announcement.pitch=1;
+  const selectedVoice=document.getElementById("announcementVoice").value;
+  if(selectedVoice){
+    const japaneseVoice=window.speechSynthesis.getVoices().find(voice=>voice.voiceURI===selectedVoice);
+    if(japaneseVoice)announcement.voice=japaneseVoice;
+  }
   window.speechSynthesis.speak(announcement);
 }
 function correctSound(){ensureAudio();tone(660,0,.15);tone(880,.14,.2);tone(1100,.3,.23)}
