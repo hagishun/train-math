@@ -346,6 +346,7 @@
   };
 
   correct=function(){
+    const runId=gameRunId;
     correctSound();
     feedback.className='feedback good';
     feedback.textContent='正解！ドアが開きます。';
@@ -353,20 +354,28 @@
     setDoorOpen(true);
     statusEl.textContent='ドア開';
     if(stations[stationIndex]==='相模原')showSparkles();
+    unlockStationAnnouncement('departure');
     setTimeout(()=>{
-      statusEl.textContent='♪ 発車メロディー';
-      feedback.textContent='♪ 発車メロディーが流れています';
-      const melodyMs=playDepartureMelody();
-      setTimeout(()=>{
-        setDoorOpen(false,true);
-        statusEl.textContent='ドア閉動作';
-        feedback.textContent='空気音と左右のドアの動きを見てね。';
+      if(runId!==gameRunId)return;
+      statusEl.textContent='発車放送';
+      feedback.textContent='発車の放送が流れています。';
+      playStationAnnouncement('departure').then(()=>{
+        if(runId!==gameRunId)return;
+        statusEl.textContent='♪ 発車ベル・メロディー';
+        feedback.textContent='♪ 発車ベルとメロディーが流れています。';
+        const melodyMs=playDepartureMelody();
         setTimeout(()=>{
-          statusEl.textContent='ドア閉';
-          feedback.textContent='ドアが閉まりました。まもなく発車！';
-        },1980);
-        setTimeout(departurePass,2250);
-      },melodyMs);
+          if(runId!==gameRunId)return;
+          setDoorOpen(false,true);
+          statusEl.textContent='ドア閉動作';
+          feedback.textContent='空気音と左右のドアの動きを見てね。';
+          setTimeout(()=>{
+            statusEl.textContent='ドア閉';
+            feedback.textContent='ドアが閉まりました。まもなく発車！';
+          },1980);
+          setTimeout(()=>{if(runId===gameRunId)departurePass()},2250);
+        },melodyMs);
+      });
     },1200);
   };
 })();

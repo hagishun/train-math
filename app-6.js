@@ -27,22 +27,8 @@ document.querySelectorAll(".subjectBtn").forEach(btn=>btn.addEventListener("clic
   }
 }));
 document.querySelectorAll(".modeBtn").forEach(btn=>btn.addEventListener("click",()=>{if(phase!=="idle")return;difficulty=btn.dataset.level;document.querySelectorAll(".modeBtn").forEach(b=>b.classList.toggle("selected",b===btn))}));
-const announcementVoice=document.getElementById("announcementVoice");
-function updateAnnouncementVoices(){
-  if(!("speechSynthesis" in window))return;
-  const selected=announcementVoice.value||localStorage.getItem("announcementVoice")||"";
-  const voices=window.speechSynthesis.getVoices().filter(voice=>voice.lang.toLowerCase().startsWith("ja"));
-  announcementVoice.replaceChildren(new Option("標準の声", ""));
-  voices.forEach(voice=>announcementVoice.add(new Option(voice.name,voice.voiceURI)));
-  announcementVoice.value=voices.some(voice=>voice.voiceURI===selected)?selected:"";
-}
-announcementVoice.addEventListener("change",()=>localStorage.setItem("announcementVoice",announcementVoice.value));
-if("speechSynthesis" in window){
-  updateAnnouncementVoices();
-  window.speechSynthesis.addEventListener("voiceschanged",updateAnnouncementVoices);
-}
-document.getElementById("startBtn").addEventListener("click",()=>{ensureAudio();if(phase==="idle")arrive()});document.getElementById("soundBtn").addEventListener("click",function(){ensureAudio();soundEnabled=!soundEnabled;if(!soundEnabled&&"speechSynthesis" in window)window.speechSynthesis.cancel();this.textContent=soundEnabled?"🔊 音あり":"🔇 音なし"});document.getElementById("resetBtn").addEventListener("click",resetGame);window.addEventListener("resize",()=>{if(phase==="question"||phase==="solved")setConsistLeft(stoppedLeft(),false)});
-function resetGame(){gameRunId++;stationIndex=0;clearStations=0;phase="idle";input="";currentProblem=null;stopWheelMotion(true);if("speechSynthesis" in window)window.speechSynthesis.cancel();clearCount.textContent="0";currentStation.textContent=stations[0];stationSign.textContent=stations[0];statusEl.textContent="運転準備";missionTitle.textContent="運転スタートを押してね";promptEl.textContent="205系がやってくるよ。";answerText.textContent="＿";feedback.className="feedback";feedback.textContent="問題が出たらテンキーで答えよう。";setDoorOpen(false,false);passCounter.classList.remove("show");setConsistLeft(offscreenLeft(),false);if(speedBars){[...speedBars.querySelectorAll("i")].forEach(b=>b.classList.remove("on"));}if(speedText)speedText.textContent="0 km/h";difficulty="easy";subjectMode="angle";document.querySelectorAll(".modeBtn").forEach((b,i)=>b.classList.toggle("selected",i===0));document.querySelectorAll(".subjectBtn").forEach((b,i)=>b.classList.toggle("selected",i===0));setProblemKind("angle");drawAngle(60,false);renderRoute();updateStationBackground()}
+document.getElementById("startBtn").addEventListener("click",()=>{ensureAudio();if(phase==="idle")arrive()});document.getElementById("soundBtn").addEventListener("click",function(){ensureAudio();soundEnabled=!soundEnabled;if(!soundEnabled)stopStationAnnouncement();this.textContent=soundEnabled?"🔊 音あり":"🔇 音なし"});document.getElementById("resetBtn").addEventListener("click",resetGame);window.addEventListener("resize",()=>{if(phase==="question"||phase==="solved")setConsistLeft(stoppedLeft(),false)});
+function resetGame(){gameRunId++;stationIndex=0;clearStations=0;phase="idle";input="";currentProblem=null;stopStationAnnouncement();stopWheelMotion(true);clearCount.textContent="0";currentStation.textContent=stations[0];stationSign.textContent=stations[0];statusEl.textContent="運転準備";missionTitle.textContent="運転スタートを押してね";promptEl.textContent="205系がやってくるよ。";answerText.textContent="＿";feedback.className="feedback";feedback.textContent="問題が出たらテンキーで答えよう。";setDoorOpen(false,false);passCounter.classList.remove("show");setConsistLeft(offscreenLeft(),false);if(speedBars){[...speedBars.querySelectorAll("i")].forEach(b=>b.classList.remove("on"));}if(speedText)speedText.textContent="0 km/h";difficulty="easy";subjectMode="angle";document.querySelectorAll(".modeBtn").forEach((b,i)=>b.classList.toggle("selected",i===0));document.querySelectorAll(".subjectBtn").forEach((b,i)=>b.classList.toggle("selected",i===0));setProblemKind("angle");drawAngle(60,false);renderRoute();updateStationBackground()}
 
 /* v9: 小4の角度学習を「見た目当て」から、三角定規・一直線・一周を使って考える問題へ */
 function clearAngleLearningLayer(showBase=true){

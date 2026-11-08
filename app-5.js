@@ -83,9 +83,10 @@ function stopWheelMotion(reset=false){
 function arrive(){
   const runId=gameRunId;
   phase="arriving";updateStationBackground();setDoorOpen(false,false);passCounter.classList.remove("show");statusEl.textContent="まもなく到着";missionTitle.textContent="205系が入線します";promptEl.textContent=stations[stationIndex]+"駅に到着";feedback.textContent="駅に近づく放送が流れるよ。";
-  setConsistLeft(offscreenLeft(),false);void consist.offsetWidth;startWheelMotion();announceApproach(stations[stationIndex]);
+  setConsistLeft(offscreenLeft(),false);void consist.offsetWidth;startWheelMotion();
+  const announcementFinished=playStationAnnouncement("approach");
   setTimeout(()=>{if(runId!==gameRunId)return;setConsistLeft(stoppedLeft(),true,"3.2s")},80);
-  setTimeout(()=>{if(runId!==gameRunId)return;stopWheelMotion();arrivalSound();phase="question";statusEl.textContent="停車中";newProblem()},3400);
+  Promise.all([announcementFinished,new Promise(resolve=>setTimeout(resolve,3400))]).then(()=>{if(runId!==gameRunId)return;stopWheelMotion();arrivalSound();phase="question";statusEl.textContent="停車中";newProblem()});
 }
 function showSparkles(){sparkles.innerHTML="";[[16,65],[28,42],[43,72],[57,38],[69,67],[81,45],[90,70]].forEach((p,i)=>{const s=document.createElement("span");s.textContent=i%2?"⭐":"✨";s.style.left=p[0]+"%";s.style.top=p[1]+"%";s.style.animationDelay=i*.07+"s";sparkles.append(s)});sparkles.classList.add("show");setTimeout(()=>sparkles.classList.remove("show"),1200)}
 function departurePass(){
@@ -100,5 +101,6 @@ function departurePass(){
 function correct(){
   const runId=gameRunId;
   correctSound();feedback.className="feedback good";feedback.textContent="正解！ドアが開きます。";if(currentProblem.kind==="angle")drawAngle(currentProblem.answer,true);setDoorOpen(true);statusEl.textContent="ドア開";if(stations[stationIndex]==="相模原")showSparkles();
-  setTimeout(()=>{if(runId!==gameRunId)return;statusEl.textContent="♪ 発車メロディー";feedback.textContent="♪ 発車メロディーが流れています";const melodyMs=playDepartureMelody();setTimeout(()=>{if(runId!==gameRunId)return;setDoorOpen(false,true);statusEl.textContent="ドア閉";feedback.textContent="ドアが閉まりました。まもなく発車！";setTimeout(()=>{if(runId===gameRunId)departurePass()},1800)},melodyMs)},1200);
+  unlockStationAnnouncement("departure");
+  setTimeout(()=>{if(runId!==gameRunId)return;statusEl.textContent="発車放送";feedback.textContent="発車の放送が流れています。";playStationAnnouncement("departure").then(()=>{if(runId!==gameRunId)return;statusEl.textContent="♪ 発車ベル・メロディー";feedback.textContent="♪ 発車ベルとメロディーが流れています。";const melodyMs=playDepartureMelody();setTimeout(()=>{if(runId!==gameRunId)return;setDoorOpen(false,true);statusEl.textContent="ドア閉";feedback.textContent="ドアが閉まりました。まもなく発車！";setTimeout(()=>{if(runId===gameRunId)departurePass()},1800)},melodyMs)})},1200);
 }

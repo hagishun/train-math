@@ -8,6 +8,7 @@
 index.html
 ├─ styles-1.css ... styles-4.css
 └─ app-1.js ... app-7.js
+   └─ audio/ : 同梱の接近放送・発車放送 MP3
 ```
 
 GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主要ゲーム処理はブラウザ内で完結します。
@@ -70,7 +71,7 @@ Web Audio APIでその場で合成し、音声ファイルは使用しません�
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
 - `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル2音ベル
-- `announceApproach()` : 選択した標準日本語音声で「1番線に電車がまいります」と放送
+- `playStationAnnouncement(kind)` : `audio/` 内の接近放送・発車放送を再生・停止
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ
 - `playVerdeRayoStyleMelody()` : 第3メロディ
