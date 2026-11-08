@@ -158,16 +158,10 @@
     .multiplyWrap{min-height:150px;border:3px solid var(--ink);border-radius:12px;background:linear-gradient(180deg,#fffdf4,#fff8d6);display:none;align-items:center;justify-content:center;padding:12px}
     .multiplyExpr{font-size:clamp(34px,7vw,68px);font-weight:1000;letter-spacing:.04em;color:#21313a;text-align:center}
     .multiplyNote{margin-top:8px;font-size:13px;font-weight:900;color:#52616b;text-align:center}
-    .frontcar .gameDoor205 .leaf205,.doorCamera .camLeaf{transition-duration:1.02s!important;transition-timing-function:cubic-bezier(.38,.02,.18,1)!important}
-    .frontcar.open .gameDoor205 .leaf205.left,.doorCamera.open .camLeaf.left{transition-delay:.02s!important}
-    .frontcar.open .gameDoor205 .leaf205.right,.doorCamera.open .camLeaf.right{transition-delay:.07s!important}
-    .frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.02s!important;transition-timing-function:cubic-bezier(.46,.01,.22,1)!important}
-    .frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.30s!important}
-    .frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s!important}
     .frontcar.door-impact .gameDoor205,.doorCamera.door-impact .camDoor{animation:realDoorImpact .13s ease-out}
     .frontcar.door-bounce .gameDoor205,.doorCamera.door-bounce .camDoor{animation:realDoorSettle .22s ease-out}
-    @keyframes realDoorImpact{0%{transform:translateX(0)}35%{transform:translateX(1.4px)}70%{transform:translateX(-.8px)}100%{transform:translateX(0)}}
-    @keyframes realDoorSettle{0%{transform:translateX(0)}45%{transform:translateX(-.6px)}100%{transform:translateX(0)}}
+    @keyframes realDoorImpact{0%{transform:translateX(0)}35%{transform:translateX(.8px)}70%{transform:translateX(-.4px)}100%{transform:translateX(0)}}
+    @keyframes realDoorSettle{0%{transform:translateX(0)}45%{transform:translateX(-.35px)}100%{transform:translateX(0)}}
     @media(max-width:1050px){.subjectPanel{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:800px){.subjectPanel{grid-template-columns:1fr}.multiplyWrap{min-height:120px}}
   `;
@@ -283,8 +277,6 @@
     clearDoorTimers();
     frontCar.classList.remove('door-sealed','door-impact','door-bounce');
     doorCamera.classList.remove('door-sealed','door-impact','door-bounce');
-    doorImpact.classList.remove('show');
-
     if(isOpen){
       frontCar.classList.remove('door-closing');
       doorCamera.classList.remove('door-closing');
@@ -294,8 +286,8 @@
         camState.textContent='OPENING';
         frontCar.classList.add('open');
         doorCamera.classList.add('open');
-      },150);
-      later(()=>{camState.textContent='OPEN';},1180);
+      },180);
+      later(()=>{camState.textContent='OPEN';},1220);
       return;
     }
 
@@ -316,33 +308,30 @@
         frontCar.classList.remove('open');
         doorCamera.classList.remove('open');
       }));
-    },140);
+    },220);
     later(()=>{
       doorImpactSound();
       frontCar.classList.add('door-impact');
       doorCamera.classList.add('door-impact');
-      doorImpact.classList.remove('show');
-      void doorImpact.offsetWidth;
-      doorImpact.classList.add('show');
-    },1490);
+      camState.textContent='LOCK';
+    },1510);
     later(()=>{
       frontCar.classList.remove('door-impact');
       doorCamera.classList.remove('door-impact');
       frontCar.classList.add('door-bounce');
       doorCamera.classList.add('door-bounce');
-      camState.textContent='LOCK';
-    },1610);
+    },1640);
     later(()=>{
       frontCar.classList.remove('door-bounce','door-closing');
       doorCamera.classList.remove('door-bounce','door-closing');
       frontCar.classList.add('door-sealed');
       doorCamera.classList.add('door-sealed');
       camState.textContent='CLOSED';
-    },1780);
+    },1810);
     later(()=>{
       frontCar.classList.remove('door-sealed');
       doorCamera.classList.remove('door-sealed');
-    },1980);
+    },2010);
   };
 
   correct=function(){

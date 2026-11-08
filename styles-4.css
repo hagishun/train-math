@@ -1,10 +1,16 @@
 .doorImpact{position:absolute;left:50%;top:47%;z-index:60;transform:translate(-50%,-50%) scale(.65);display:none;pointer-events:none;font-size:clamp(42px,8vw,86px);font-weight:1000;color:#d9362b;-webkit-text-stroke:4px #fff;text-shadow:3px 4px 0 #26343b}
-.doorImpact.show{display:block;animation:impactPop .42s ease-out forwards}
-@keyframes impactPop{0%{transform:translate(-50%,-50%) scale(.45) rotate(-7deg);opacity:0}35%{transform:translate(-50%,-50%) scale(1.22) rotate(4deg);opacity:1}70%{transform:translate(-50%,-50%) scale(.94) rotate(-2deg);opacity:1}100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:0}}
-.frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s !important;transition-duration:.78s !important}
-.frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.52s !important;transition-duration:.58s !important}
-.frontcar.door-impact .gameDoor205 .leaf205.left{transform:translateX(4px) !important}.frontcar.door-impact .gameDoor205 .leaf205.right{transform:translateX(-4px) !important}.doorCamera.door-impact .camLeaf.left{transform:translateX(3px) !important}.doorCamera.door-impact .camLeaf.right{transform:translateX(-3px) !important}
-.frontcar.door-bounce .gameDoor205 .leaf205.left{transform:translateX(-2px) !important}.frontcar.door-bounce .gameDoor205 .leaf205.right{transform:translateX(2px) !important}.doorCamera.door-bounce .camLeaf.left{transform:translateX(-1.5px) !important}.doorCamera.door-bounce .camLeaf.right{transform:translateX(1.5px) !important}
+.frontcar .gameDoor205 .leaf205,.doorCamera .camLeaf{transition-property:transform;transition-duration:.92s;transition-timing-function:cubic-bezier(.42,.02,.2,1)}
+.frontcar.open .gameDoor205 .leaf205.left,.doorCamera.open .camLeaf.left{transition-delay:.02s}
+.frontcar.open .gameDoor205 .leaf205.right,.doorCamera.open .camLeaf.right{transition-delay:.10s}
+.frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.02s;transition-timing-function:cubic-bezier(.38,.02,.2,1)}
+.frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.18s}
+.frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
+.frontcar.door-impact .gameDoor205,.doorCamera.door-impact .camDoor{animation:realDoorImpact .13s ease-out}
+.frontcar.door-bounce .gameDoor205,.doorCamera.door-bounce .camDoor{animation:realDoorSettle .22s ease-out}
+@keyframes realDoorImpact{0%{transform:translateX(0)}35%{transform:translateX(.8px)}70%{transform:translateX(-.4px)}100%{transform:translateX(0)}}
+@keyframes realDoorSettle{0%{transform:translateX(0)}45%{transform:translateX(-.35px)}100%{transform:translateX(0)}}
+.frontcar.door-impact .gameDoor205 .leaf205.left{transform:translateX(1px)}.frontcar.door-impact .gameDoor205 .leaf205.right{transform:translateX(-1px)}.doorCamera.door-impact .camLeaf.left{transform:translateX(.7px)}.doorCamera.door-impact .camLeaf.right{transform:translateX(-.7px)}
+.frontcar.door-bounce .gameDoor205 .leaf205.left{transform:translateX(-.5px)}.frontcar.door-bounce .gameDoor205 .leaf205.right{transform:translateX(.5px)}.doorCamera.door-bounce .camLeaf.left{transform:translateX(-.3px)}.doorCamera.door-bounce .camLeaf.right{transform:translateX(.3px)}
 .speedBox{position:absolute;right:16px;bottom:14px;z-index:30;display:flex;align-items:center;gap:8px;padding:7px 10px;border:3px solid var(--ink);border-radius:10px;background:rgba(255,255,255,.92);font-weight:1000}
 .speedBars{display:flex;align-items:flex-end;gap:3px;height:26px}.speedBars i{display:block;width:8px;background:#75d96e;border:1px solid #31513a;opacity:.22}.speedBars i:nth-child(1){height:6px}.speedBars i:nth-child(2){height:10px}.speedBars i:nth-child(3){height:14px}.speedBars i:nth-child(4){height:18px}.speedBars i:nth-child(5){height:22px}.speedBars i:nth-child(6){height:26px}.speedBars i.on{opacity:1}
 .driveInfo{display:flex;justify-content:flex-end;min-height:48px;padding:0 4px}.driveInfo .speedBox{position:static;min-width:230px;justify-content:center;box-shadow:0 3px 0 var(--ink)}
