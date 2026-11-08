@@ -152,6 +152,43 @@ function playDepartureChime(){
     });
   });
 }
+function playDepartureMelodyNote(ctx,now,frequency,offset,duration,pan,dry,delayL,delayR){
+  const start=now+offset;
+  const panner=ctx.createStereoPanner?ctx.createStereoPanner():null;
+  const voiceFilter=ctx.createBiquadFilter();
+  voiceFilter.type="lowpass";
+  voiceFilter.frequency.setValueAtTime(Math.min(7200,frequency*7),start);
+  voiceFilter.Q.setValueAtTime(.45,start);
+  if(panner){
+    panner.pan.setValueAtTime(pan,start);
+    voiceFilter.connect(panner);
+    panner.connect(dry);
+    panner.connect(delayL);
+    panner.connect(delayR);
+  }else{
+    voiceFilter.connect(dry);
+    voiceFilter.connect(delayL);
+    voiceFilter.connect(delayR);
+  }
+  [[1,"triangle",.075],[2,"sine",.018],[3,"sine",.005]].forEach(([partial,type,volume])=>{
+    const oscillator=ctx.createOscillator();
+    const gain=ctx.createGain();
+    const attack=start+.009;
+    const settle=start+.045;
+    const release=start+duration;
+    oscillator.type=type;
+    oscillator.frequency.setValueAtTime(frequency*partial*1.003,start);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency*partial,settle);
+    gain.gain.setValueAtTime(.0001,start);
+    gain.gain.exponentialRampToValueAtTime(volume,attack);
+    gain.gain.exponentialRampToValueAtTime(volume*.68,settle);
+    gain.gain.exponentialRampToValueAtTime(.0001,release);
+    oscillator.connect(gain);
+    gain.connect(voiceFilter);
+    oscillator.start(start);
+    oscillator.stop(release+.025);
+  });
+}
 function stopStationAnnouncement(){
   if(!activeStationAnnouncement)return;
   activeStationAnnouncement.audio.pause();

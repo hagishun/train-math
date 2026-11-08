@@ -38,25 +38,8 @@ function playOriginalDepartureMelody(){
   const fullNotes=notes.concat(notes.map(([freq,offset,dur])=>[freq,offset+phraseDuration,dur]));
   fullNotes.forEach((n,i)=>{
     const [freq,offset,dur]=n;
-    const o=ctx.createOscillator();
-    const g=ctx.createGain();
-    const p=ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    o.type="triangle";
-    o.frequency.setValueAtTime(freq,now+offset);
-    g.gain.setValueAtTime(.001,now+offset);
-    g.gain.linearRampToValueAtTime(.10,now+offset+.025);
-    g.gain.exponentialRampToValueAtTime(.001,now+offset+dur);
-    if(p){
-      const pos=(i%4<2)?-.30:.30;
-      p.pan.setValueAtTime(pos,now+offset);
-      o.connect(g);g.connect(p);p.connect(dry);
-      p.connect(delayL);p.connect(delayR);
-    }else{
-      o.connect(g);g.connect(dry);
-      g.connect(delayL);g.connect(delayR);
-    }
-    o.start(now+offset);
-    o.stop(now+offset+dur+.03);
+    const pos=(i%4<2)?-.24:.24;
+    playDepartureMelodyNote(ctx,now,freq,offset,dur,pos,dry,delayL,delayR);
   });
   [.18,.31,.44].forEach((dt,idx)=>{
     const d=ctx.createDelay(.6);
@@ -108,35 +91,8 @@ function playSpringBoxStyleMelody(){
   const fullNotes=notes.concat(notes.map(([freq,offset,dur])=>[freq,offset+phraseDuration,dur]));
   fullNotes.forEach((n,i)=>{
     const [freq,offset,dur]=n;
-    const o=ctx.createOscillator();
-    const g=ctx.createGain();
-    const p=ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    o.type="sine";
-    o.frequency.setValueAtTime(freq,now+offset);
-    g.gain.setValueAtTime(.001,now+offset);
-    g.gain.linearRampToValueAtTime(.11,now+offset+.015);
-    g.gain.exponentialRampToValueAtTime(.001,now+offset+dur);
-    if(p){
-      const pos=(i%6<3)?-.26:.26;
-      p.pan.setValueAtTime(pos,now+offset);
-      o.connect(g); g.connect(p); p.connect(dry);
-      p.connect(delayL); p.connect(delayR);
-    }else{
-      o.connect(g); g.connect(dry);
-      g.connect(delayL); g.connect(delayR);
-    }
-    o.start(now+offset);
-    o.stop(now+offset+dur+.03);
-    const o2=ctx.createOscillator();
-    const g2=ctx.createGain();
-    o2.type="triangle";
-    o2.frequency.setValueAtTime(freq*2,now+offset);
-    g2.gain.setValueAtTime(.001,now+offset);
-    g2.gain.linearRampToValueAtTime(.025,now+offset+.01);
-    g2.gain.exponentialRampToValueAtTime(.001,now+offset+Math.min(dur,.18));
-    o2.connect(g2); g2.connect(dry);
-    o2.start(now+offset);
-    o2.stop(now+offset+Math.min(dur,.2)+.02);
+    const pos=(i%6<3)?-.22:.22;
+    playDepartureMelodyNote(ctx,now,freq,offset,dur,pos,dry,delayL,delayR);
   });
   [.16,.28,.40].forEach((dt,idx)=>{
     const d=ctx.createDelay(.6);
