@@ -7,6 +7,13 @@ const stationAnnouncements={
   departure:new Audio("audio/departure-announcement.mp3")
 };
 Object.values(stationAnnouncements).forEach(audio=>{audio.preload="auto";audio.volume=.9});
+const departureMelodies=[
+  new Audio("audio/JRE-IKST-017-01.wav"),
+  new Audio("audio/JRE-IKST-017-02.wav")
+];
+departureMelodies.forEach(audio=>{audio.preload="auto";audio.volume=.85});
+let activeDepartureMelody=null;
+let queuedDepartureMelody=null;
 let activeStationAnnouncement=null;
 function ensureAudio(){if(!audioContext){const C=window.AudioContext||window.webkitAudioContext;if(C)audioContext=new C()}if(audioContext&&audioContext.state==="suspended")audioContext.resume()}
 function tone(freq,start,dur,vol=.07){if(!soundEnabled||!audioContext)return;const o=audioContext.createOscillator(),g=audioContext.createGain();o.type="sine";o.frequency.value=freq;g.gain.setValueAtTime(.0001,audioContext.currentTime+start);g.gain.exponentialRampToValueAtTime(vol,audioContext.currentTime+start+.02);g.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+start+dur);o.connect(g);g.connect(audioContext.destination);o.start(audioContext.currentTime+start);o.stop(audioContext.currentTime+start+dur+.03)}
@@ -194,6 +201,47 @@ function stopStationAnnouncement(){
   activeStationAnnouncement.audio.pause();
   activeStationAnnouncement.audio.currentTime=0;
   activeStationAnnouncement.finish();
+}
+function stopDepartureMelody(){
+  if(!activeDepartureMelody)return;
+  activeDepartureMelody.pause();
+  activeDepartureMelody.currentTime=0;
+  activeDepartureMelody=null;
+}
+function playDepartureAudio(){
+  if(!soundEnabled)return;
+  stopDepartureMelody();
+  const audio=queuedDepartureMelody||departureMelodies[departureMelodyVariant++%departureMelodies.length];
+  queuedDepartureMelody=null;
+  activeDepartureMelody=audio;
+  audio.currentTime=0;
+  audio.play()?.catch(error=>{
+    if(activeDepartureMelody!==audio||!soundEnabled)return;
+    console.error("Failed to play departure melody",error);
+    if(phase!=="idle"){feedback.className="feedback warn";feedback.textContent="発車メロディーを再生できませんでした。"}
+  });
+}
+function unlockDepartureMelody(){
+  if(!soundEnabled)return;
+  const audio=departureMelodies[departureMelodyVariant++%departureMelodies.length];
+  queuedDepartureMelody=audio;
+  audio.muted=true;
+  audio.currentTime=0;
+  const playback=audio.play();
+  if(!playback){
+    audio.pause();
+    audio.currentTime=0;
+    audio.muted=false;
+    return;
+  }
+  playback.then(()=>{
+    audio.pause();
+    audio.currentTime=0;
+    audio.muted=false;
+  }).catch(error=>{
+    audio.muted=false;
+    console.error("Failed to unlock departure melody",error);
+  });
 }
 function unlockStationAnnouncement(kind){
   if(!soundEnabled)return;

@@ -63,7 +63,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 
 ### 音
 
-効果音・ベル・メロディはWeb Audio APIで合成し、駅放送は`audio/`内のMP3を再生します。
+効果音・発車ベルはWeb Audio APIで合成し、駅放送と発車メロディーは`audio/`内の音声ファイルを再生します。
 
 - `ensureAudio()` : AudioContext準備
 - `tone()` : 基本音生成
@@ -71,14 +71,13 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
 - `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル上昇音ベル
-- `playDepartureMelodyNote()` : 発車メロディの基音・倍音・音の余韻を生成
+- `playDepartureAudio()` : `audio/`内の2種類の発車メロディー音源を交互に再生
+- `unlockDepartureMelody()` : 発車メロディーをユーザー操作後に再生できるよう準備
+- `stopDepartureMelody()` : 消音・リセット時に発車メロディーを停止
 - `playStationAnnouncement(kind)` : `audio/` 内の接近放送・発車放送を再生・停止
-- `playOriginalDepartureMelody()` : 第1メロディ
-- `playSpringBoxStyleMelody()` : 第2メロディ
-- `playVerdeRayoStyleMelody()` : 第3メロディ
-- `playGlassBellNote()` : 基音と6・8倍音を重ねたガラス風電子ベル音
-- `playStationReferenceStyleMelody()` : 参考録音の雰囲気に合わせたオリジナル旋律（13秒）
-- `playDepartureMelody()` : ベルの後に参考音源風メロディを再生（旧3曲は関数として残置）
+- `playDepartureMelody()` : ベルの後に音源を再生し、発車放送までの待ち時間を返す
+
+以前の合成メロディー関数は`app-2.js`と`app-3.js`に残っていますが、現在の発車シーケンスでは使用しません。
 
 ## 4. イベントの基本フロー
 
@@ -129,7 +128,7 @@ newProblem()
 4. 接近放送終了後に入線し、正解 → ドア開 → 発車ベル・メロディ → 発車放送 → 閉扉 → 発車の順に進むこと。
 5. 到着時に戸当たり音や空気音が誤って鳴らないこと。
 6. ドアが閉まり切る前に列車が動かないこと。
-7. 発車メロディ（約13秒）が鳴り終わってから発車放送が始まること。
+7. 発車ベルと約12秒の発車メロディー音源が終わってから発車放送が始まること。
 8. 駅別背景が正しく切り替わること。
 9. 速度計が車両や問題UIに重ならないこと。
 10. タッチ環境で操作不能な要素がないこと。
