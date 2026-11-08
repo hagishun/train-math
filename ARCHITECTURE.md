@@ -69,6 +69,7 @@ Web Audio APIでその場で合成し、音声ファイルは使用しません�
 - `arrivalSound()` : 到着音
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
+- `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル2音ベル
 - `announceApproach()` : 選択した標準日本語音声で「1番線に電車がまいります」と放送
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ

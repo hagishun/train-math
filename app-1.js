@@ -109,6 +109,42 @@ function doorImpactSound(){
   o2.connect(g2);g2.connect(audioContext.destination);o2.start(now+.02);o2.stop(now+.13);
 }
 function arrivalSound(){ensureAudio();tone(440,0,.18);tone(523,.2,.18);tone(659,.4,.35)}
+function playDepartureChime(){
+  if(!soundEnabled||!audioContext)return;
+  const ctx=audioContext,now=ctx.currentTime;
+  const master=ctx.createGain(),filter=ctx.createBiquadFilter();
+  filter.type="lowpass";
+  filter.frequency.setValueAtTime(4200,now);
+  filter.Q.setValueAtTime(.55,now);
+  master.gain.setValueAtTime(.52,now);
+  filter.connect(master);
+  master.connect(ctx.destination);
+  const echo=ctx.createDelay(.2),echoGain=ctx.createGain();
+  echo.delayTime.setValueAtTime(.075,now);
+  echoGain.gain.setValueAtTime(.12,now);
+  echo.connect(echoGain);
+  echoGain.connect(ctx.destination);
+  [[880,0,-.12],[659.25,.19,.12]].forEach(([frequency,offset,pan])=>{
+    [[1,.085,.42],[2.76,.032,.24],[5.4,.012,.12]].forEach(([partial,volume,duration])=>{
+      const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+      const panner=ctx.createStereoPanner?ctx.createStereoPanner():null;
+      const start=now+offset;
+      oscillator.type="sine";
+      oscillator.frequency.setValueAtTime(frequency*partial,start);
+      gain.gain.setValueAtTime(.0001,start);
+      gain.gain.exponentialRampToValueAtTime(volume,start+.006);
+      gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+      if(panner){
+        panner.pan.setValueAtTime(pan,start);
+        oscillator.connect(gain);gain.connect(panner);panner.connect(filter);panner.connect(echo);
+      }else{
+        oscillator.connect(gain);gain.connect(filter);gain.connect(echo);
+      }
+      oscillator.start(start);
+      oscillator.stop(start+duration+.02);
+    });
+  });
+}
 function announceApproach(station){
   if(!soundEnabled||!("speechSynthesis" in window))return;
   window.speechSynthesis.cancel();
