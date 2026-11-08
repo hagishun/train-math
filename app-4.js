@@ -3,7 +3,7 @@ function playDepartureMelody(){
   departureMelodyVariant=(departureMelodyVariant+1)%3;
   const melodies=[playOriginalDepartureMelody,playSpringBoxStyleMelody,playVerdeRayoStyleMelody];
   const durations=[7100,6900,7200];
-  const chimeDuration=650;
+  const chimeDuration=1100;
   playDepartureChime();
   setTimeout(melodies[variant],chimeDuration);
   return durations[variant]+chimeDuration;

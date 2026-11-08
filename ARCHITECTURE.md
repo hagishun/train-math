@@ -63,14 +63,14 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 
 ### 音
 
-Web Audio APIでその場で合成し、音声ファイルは使用しません。
+効果音・ベル・メロディはWeb Audio APIで合成し、駅放送は`audio/`内のMP3を再生します。
 
 - `ensureAudio()` : AudioContext準備
 - `tone()` : 基本音生成
 - `arrivalSound()` : 到着音
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
-- `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル2音ベル
+- `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル上昇音ベル
 - `playStationAnnouncement(kind)` : `audio/` 内の接近放送・発車放送を再生・停止
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ
@@ -84,6 +84,10 @@ Web Audio APIでその場で合成し、音声ファイルは使用しません�
   ↓
 arrive()
   ↓
+接近放送終了
+   ↓
+入線・停車
+   ↓
 newProblem()
   ↓
 回答
@@ -92,7 +96,9 @@ newProblem()
               ↓
            ドア開
               ↓
-           発車メロディ
+           発車ベル・メロディ
+              ↓
+           発車放送終了
               ↓
            ドア閉
               ↓
@@ -117,7 +123,7 @@ newProblem()
 1. JavaScriptの構文チェックが通ること。
 2. ゲーム開始 → 到着 → 出題まで進むこと。
 3. 角度 / グラフ / 分数 / ミックスで最低1問ずつ生成できること。
-4. 正解 → ドア開 → 発車メロディ → 閉扉 → 発車 → 次駅到着まで進むこと。
+4. 接近放送終了後に入線し、正解 → ドア開 → 発車ベル・メロディ → 発車放送 → 閉扉 → 発車の順に進むこと。
 5. 到着時に戸当たり音や空気音が誤って鳴らないこと。
 6. ドアが閉まり切る前に列車が動かないこと。
 7. 3種類の発車メロディが順番に切り替わること。

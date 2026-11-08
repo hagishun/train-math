@@ -120,25 +120,26 @@ function playDepartureChime(){
   const ctx=audioContext,now=ctx.currentTime;
   const master=ctx.createGain(),filter=ctx.createBiquadFilter();
   filter.type="lowpass";
-  filter.frequency.setValueAtTime(4200,now);
+  filter.frequency.setValueAtTime(5200,now);
   filter.Q.setValueAtTime(.55,now);
-  master.gain.setValueAtTime(.52,now);
+  master.gain.setValueAtTime(.42,now);
   filter.connect(master);
   master.connect(ctx.destination);
   const echo=ctx.createDelay(.2),echoGain=ctx.createGain();
-  echo.delayTime.setValueAtTime(.075,now);
-  echoGain.gain.setValueAtTime(.12,now);
+  echo.delayTime.setValueAtTime(.09,now);
+  echoGain.gain.setValueAtTime(.16,now);
   echo.connect(echoGain);
-  echoGain.connect(ctx.destination);
-  [[880,0,-.12],[659.25,.19,.12]].forEach(([frequency,offset,pan])=>{
-    [[1,.085,.42],[2.76,.032,.24],[5.4,.012,.12]].forEach(([partial,volume,duration])=>{
+  echoGain.connect(filter);
+  const notes=[[783.99,0,-.18],[987.77,.17,0],[1174.66,.34,.18],[1567.98,.56,0]];
+  notes.forEach(([frequency,offset,pan])=>{
+    [[1,.10,.42],[2.01,.027,.29],[3.92,.008,.17]].forEach(([partial,volume,duration])=>{
       const oscillator=ctx.createOscillator(),gain=ctx.createGain();
       const panner=ctx.createStereoPanner?ctx.createStereoPanner():null;
       const start=now+offset;
       oscillator.type="sine";
       oscillator.frequency.setValueAtTime(frequency*partial,start);
       gain.gain.setValueAtTime(.0001,start);
-      gain.gain.exponentialRampToValueAtTime(volume,start+.006);
+      gain.gain.exponentialRampToValueAtTime(volume,start+.007);
       gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
       if(panner){
         panner.pan.setValueAtTime(pan,start);
