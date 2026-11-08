@@ -107,5 +107,6 @@ function correct(){
   const runId=gameRunId;
   correctSound();feedback.className="feedback good";feedback.textContent="正解！ドアが開きます。";if(currentProblem.kind==="angle")drawAngle(currentProblem.answer,true);setDoorOpen(true);statusEl.textContent="ドア開";if(stations[stationIndex]==="相模原")showSparkles();
   unlockStationAnnouncement("departure");
+  unlockDepartureMelody();
   setTimeout(()=>{if(runId!==gameRunId)return;statusEl.textContent="♪ 発車ベル・メロディー";feedback.textContent="発車ベルとメロディーが流れています。";const melodyMs=playDepartureMelody();setTimeout(()=>{if(runId!==gameRunId)return;statusEl.textContent="発車放送";feedback.textContent="発車の放送が流れています。";playStationAnnouncement("departure").then(()=>{if(runId!==gameRunId)return;setDoorOpen(false,true);statusEl.textContent="ドア閉";feedback.textContent="ドアが閉まりました。まもなく発車！";setTimeout(()=>{if(runId===gameRunId)departurePass()},1800)})},melodyMs)},1200);
 }
