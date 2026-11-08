@@ -35,7 +35,9 @@ function playVerdeRayoStyleMelody(){
     [659.25,4.68,.26],[739.99,4.96,.26],[783.99,5.24,.30],[880.00,5.56,.30],
     [783.99,5.90,.26],[739.99,6.18,.26],[659.25,6.46,.58]
   ];
-  notes.forEach((n,i)=>{
+  const phraseDuration=7.1;
+  const fullNotes=notes.concat(notes.map(([freq,offset,dur])=>[freq,offset+phraseDuration,dur]));
+  fullNotes.forEach((n,i)=>{
     const [freq,offset,dur]=n;
     const o=ctx.createOscillator();
     const g=ctx.createGain();
@@ -74,6 +76,6 @@ function playVerdeRayoStyleMelody(){
     gg.gain.setValueAtTime(.042/(idx+1),now);
     dry.connect(d); d.connect(gg); gg.connect(master);
   });
-  return 7200;
+  return 14600;
 }
 let departureMelodyVariant=0;

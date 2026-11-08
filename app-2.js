@@ -34,7 +34,9 @@ function playOriginalDepartureMelody(){
     [783.99,3.04,.48],[659.25,3.56,.34],[587.33,3.94,.34],[523.25,4.32,.55],
     [587.33,4.92,.34],[659.25,5.30,.34],[698.46,5.68,.34],[659.25,6.06,.68]
   ];
-  notes.forEach((n,i)=>{
+  const phraseDuration=6.8;
+  const fullNotes=notes.concat(notes.map(([freq,offset,dur])=>[freq,offset+phraseDuration,dur]));
+  fullNotes.forEach((n,i)=>{
     const [freq,offset,dur]=n;
     const o=ctx.createOscillator();
     const g=ctx.createGain();
@@ -63,7 +65,7 @@ function playOriginalDepartureMelody(){
     gg.gain.setValueAtTime(.05/(idx+1),now);
     dry.connect(d);d.connect(gg);gg.connect(master);
   });
-  return 7100;
+  return 14000;
 }
 function playSpringBoxStyleMelody(){
   ensureAudio();
@@ -102,7 +104,9 @@ function playSpringBoxStyleMelody(){
     [587.33,4.14,.22],[659.25,4.38,.22],[783.99,4.62,.26],[880.00,4.90,.26],
     [783.99,5.20,.22],[698.46,5.44,.22],[659.25,5.68,.22],[523.25,5.92,.56]
   ];
-  notes.forEach((n,i)=>{
+  const phraseDuration=6.55;
+  const fullNotes=notes.concat(notes.map(([freq,offset,dur])=>[freq,offset+phraseDuration,dur]));
+  fullNotes.forEach((n,i)=>{
     const [freq,offset,dur]=n;
     const o=ctx.createOscillator();
     const g=ctx.createGain();
@@ -141,5 +145,5 @@ function playSpringBoxStyleMelody(){
     gg.gain.setValueAtTime(.045/(idx+1),now);
     dry.connect(d); d.connect(gg); gg.connect(master);
   });
-  return 6900;
+  return 13500;
 }
