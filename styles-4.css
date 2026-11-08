@@ -10,3 +10,83 @@
 .driveInfo{display:flex;justify-content:flex-end;min-height:48px;padding:0 4px}.driveInfo .speedBox{position:static;min-width:230px;justify-content:center;box-shadow:0 3px 0 var(--ink)}
 @media(max-width:800px){.subjectPanel{grid-template-columns:repeat(2,1fr)}.driveInfo{justify-content:stretch}.driveInfo .speedBox{width:100%}}
 .fractionWrap{min-height:150px;border:3px solid var(--ink);border-radius:12px;background:white;padding:18px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}.fractionExpr{font-size:clamp(34px,6vw,62px);line-height:1.1;font-weight:1000;letter-spacing:.02em}.fractionHelp{font-size:14px;font-weight:900}
+
+.car{
+  background:
+    repeating-linear-gradient(90deg,transparent 0 100px,rgba(74,85,89,.09) 100px 101px),
+    linear-gradient(180deg,#f9fafb 0%,#dfe3e4 12%,#f2f4f4 22%,#cbd1d3 72%,#f4f5f5 88%,#c3c9cb 100%);
+  border-color:#596164;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.92),inset 0 -3px 0 rgba(74,82,85,.22),0 4px 0 rgba(0,0,0,.24);
+}
+.roof{
+  background:repeating-linear-gradient(90deg,#aeb5b7 0 22px,#929a9d 22px 24px);
+  box-shadow:0 2px 2px rgba(0,0,0,.25);
+}
+.ac{
+  background:linear-gradient(180deg,#d5d9da,#a2aaad 55%,#c3c8ca);
+  box-shadow:0 2px 2px rgba(0,0,0,.2);
+}
+.ac:before,.ac:after{
+  background:repeating-linear-gradient(90deg,#646d70 0 3px,#aeb5b7 3px 5px);
+}
+.window,.car:not(.frontcar) .window{
+  overflow:hidden;
+  background:
+    linear-gradient(112deg,transparent 0 33%,rgba(216,240,246,.62) 34% 38%,transparent 39% 100%),
+    linear-gradient(180deg,#14282d 0%,#243b40 48%,#101b1e 100%);
+  border-color:#697477;
+  box-shadow:inset 0 0 0 2px #202a2d,inset 0 2px 3px rgba(255,255,255,.34),0 1px 2px rgba(0,0,0,.35);
+}
+.window:after,.frontcar .sideWin205:after{
+  content:"";
+  position:absolute;
+  left:5px;
+  right:5px;
+  top:4px;
+  height:2px;
+  background:rgba(232,247,250,.42);
+}
+.car:not(.frontcar) .door,.frontcar .passDoor205{
+  background:
+    linear-gradient(90deg,rgba(99,108,111,.22),transparent 14% 86%,rgba(99,108,111,.2)),
+    linear-gradient(180deg,#fafbfb,#d9ddde 72%,#c9ced0);
+  box-shadow:inset 0 1px 0 #fff,inset 0 -2px 2px rgba(76,84,87,.2),0 1px 2px rgba(0,0,0,.18);
+}
+.car:not(.frontcar) .door:before,.car:not(.frontcar) .door:after,
+.frontcar .passDoor205 .dw{
+  background:linear-gradient(135deg,#102126,#294148 55%,#16272b);
+  box-shadow:inset 1px 1px 0 rgba(210,238,242,.38);
+}
+.stripeGreen,.frontcar .stripeGreen{
+  background:linear-gradient(180deg,#4f9a5c,#317743 65%,#286b3a);
+  box-shadow:0 1px 1px rgba(0,0,0,.22);
+}
+.stripeLime,.frontcar .stripeLime{
+  background:linear-gradient(180deg,#a9cf61,#7ea938);
+  box-shadow:0 1px 1px rgba(0,0,0,.2);
+}
+.under{filter:drop-shadow(0 2px 1px rgba(0,0,0,.3))}
+.equipment{
+  background:repeating-linear-gradient(90deg,#30383b 0 12px,#50595c 12px 15px);
+  border-color:#252b2d;
+  box-shadow:inset 0 2px 0 rgba(190,199,202,.28);
+}
+.bogie{
+  background:linear-gradient(180deg,#70787b 0%,#42494c 38%,#252b2d 100%);
+  border-color:#303639;
+  box-shadow:inset 0 3px 0 rgba(200,207,209,.25),0 2px 2px rgba(0,0,0,.3);
+}
+.wheel{
+  background:repeating-conic-gradient(#9ba4a7 0deg 7deg,#4a5154 7deg 45deg);
+  border-color:#41484b;
+  box-shadow:inset 0 0 0 2px #626b6e,0 1px 2px rgba(0,0,0,.4);
+}
+.wheel:before{
+  left:5px;
+  top:5px;
+  width:5px;
+  height:5px;
+  background:#c1c8ca;
+  box-shadow:0 0 0 2px #50585b;
+}
+.wheel:after{background:#d0d5d6}
