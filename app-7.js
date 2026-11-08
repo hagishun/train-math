@@ -357,14 +357,14 @@
     unlockStationAnnouncement('departure');
     setTimeout(()=>{
       if(runId!==gameRunId)return;
-      statusEl.textContent='発車放送';
-      feedback.textContent='発車の放送が流れています。';
-      playStationAnnouncement('departure').then(()=>{
+      statusEl.textContent='♪ 発車ベル・メロディー';
+      feedback.textContent='発車ベルとメロディーが流れています。';
+      const melodyMs=playDepartureMelody();
+      setTimeout(()=>{
         if(runId!==gameRunId)return;
-        statusEl.textContent='♪ 発車ベル・メロディー';
-        feedback.textContent='♪ 発車ベルとメロディーが流れています。';
-        const melodyMs=playDepartureMelody();
-        setTimeout(()=>{
+        statusEl.textContent='発車放送';
+        feedback.textContent='発車の放送が流れています。';
+        playStationAnnouncement('departure').then(()=>{
           if(runId!==gameRunId)return;
           setDoorOpen(false,true);
           statusEl.textContent='ドア閉動作';
@@ -374,8 +374,8 @@
             feedback.textContent='ドアが閉まりました。まもなく発車！';
           },1980);
           setTimeout(()=>{if(runId===gameRunId)departurePass()},2250);
-        },melodyMs);
-      });
+        });
+      },melodyMs);
     },1200);
   };
 })();
