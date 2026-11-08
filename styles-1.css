@@ -30,7 +30,8 @@ button{font:inherit;touch-action:manipulation}
 .door{position:absolute;top:22px;width:43px;height:91px;background:#f5f6f6;border:3px solid #656d70;z-index:3}.d1{left:82px}.d2{left:187px}.d3{right:80px}
 .door:before{content:"";position:absolute;top:10px;left:9px;width:19px;height:32px;background:#343a3c;border:2px solid #5c6467;border-radius:2px}.door:after{content:"";position:absolute;top:53px;left:18px;width:4px;height:18px;background:#777}
 .under{position:absolute;left:25px;right:25px;bottom:-15px;height:18px;display:flex;justify-content:space-around}.equipment{width:70px;height:14px;background:#444b4e;border:2px solid #2e3436}
-.bogie{position:absolute;bottom:-23px;width:83px;height:29px;background:#585f62;border:3px solid #34393b;border-radius:9px}.b1{left:37px}.b2{right:37px}.wheel{position:absolute;bottom:-9px;width:25px;height:25px;border-radius:50%;background:#4b5052;border:5px solid #747c80}.wl{left:7px}.wr{right:7px}
+.bogie{position:absolute;bottom:-23px;width:83px;height:29px;background:#585f62;border:3px solid #34393b;border-radius:9px}.b1{left:37px}.b2{right:37px}.wheel{position:absolute;bottom:-9px;width:25px;height:25px;border-radius:50%;background:#4b5052;border:5px solid #747c80}.wheel:before{content:"";position:absolute;left:5px;top:5px;width:5px;height:5px;border-radius:50%;background:#aeb5b7}.wheel:after{content:"";position:absolute;left:9px;top:0;width:2px;height:15px;background:#aeb5b7;transform-origin:center}
+.wl{left:7px}.wr{right:7px}
 .coupler{position:absolute;right:-10px;bottom:16px;width:16px;height:9px;background:#2d3335;z-index:10}
 .jr{position:absolute;left:18px;top:76px;font-size:14px;font-weight:1000;color:#333}
 .number{position:absolute;left:17px;bottom:11px;font-size:9px;color:#4a4f51}

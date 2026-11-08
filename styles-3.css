@@ -20,6 +20,8 @@
 .stationBackdrop.chuo .bgTrain{width:300px;--bgstripe:#ef7d22;animation-duration:9.5s}
 .stationBackdrop.hachiko .bgTrain.secondary{width:250px;top:40%;--bgstripe:#8da64a;animation-duration:12s;animation-delay:-5s}
 .stationBackdrop .bgTrain.secondary{animation-direction:reverse;opacity:.84}
+.consist.moving .wheel{animation:wheelRotate var(--wheel-period,1s) linear infinite;will-change:transform}
+@keyframes wheelRotate{to{transform:rotate(360deg)}}
 .frontcar.door-closing .gameDoor205 .leaf205,.doorCamera.door-closing .camLeaf{transition-duration:1.12s;transition-timing-function:cubic-bezier(.32,.02,.18,1)}
 .frontcar.door-closing .gameDoor205 .leaf205.left,.doorCamera.door-closing .camLeaf.left{transition-delay:.28s}
 .frontcar.door-closing .gameDoor205 .leaf205.right,.doorCamera.door-closing .camLeaf.right{transition-delay:0s}
