@@ -48,7 +48,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `carStep()` : 1両分の寸法計算
 - `stoppedLeft()` / `offscreenLeft()` : 停車位置 / 画面外位置
 - `setConsistLeft()` : 編成全体の位置反映
-- `moving` クラスと `--wheel-period` : 車輪の回転を列車の移動・加速に同期
+- `startWheelMotion()` / `stopWheelMotion()` : 列車の実移動量から車輪の回転角を反映
 - `updateStationBackground()` : 駅別背景の切替
 - `renderRoute()` : 路線表示の更新
 
@@ -69,6 +69,7 @@ Web Audio APIでその場で合成し、音声ファイルは使用しません�
 - `arrivalSound()` : 到着音
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
+- `announceApproach()` : Web Speech API の日本語音声で接近放送
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ
 - `playVerdeRayoStyleMelody()` : 第3メロディ
@@ -104,6 +105,7 @@ newProblem()
 
 - 到着時に閉扉音を誤発火させないこと
 - ドアが閉まり切る前に発車しないこと
+- リセット後に古い駅到着・発車タイマーがゲームを再開しないこと
 - iOS系ブラウザではユーザー操作を起点にAudioContextを開始すること
 - 科目追加時は図・単位・回答欄の切替も確認すること
 - 分割ファイル間の関数名・状態変数の依存を壊さないこと
@@ -120,4 +122,5 @@ newProblem()
 8. 駅別背景が正しく切り替わること。
 9. 速度計が車両や問題UIに重ならないこと。
 10. タッチ環境で操作不能な要素がないこと。
-11. 到着・発車中に車輪が回り、発車時は加速に合わせて回転が速くなること。
+11. 車輪の回転角が列車の画面上の移動量に連動し、停車中は回転しないこと。
+12. 対応ブラウザで駅への接近放送が流れ、消音・リセットで停止すること。

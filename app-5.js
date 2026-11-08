@@ -49,17 +49,56 @@ function carStep(){const car=consist.querySelector(".car");return car.getBoundin
 function stoppedLeft(){const step=carStep();const carWidth=step-4;const desiredFrontEdge=Math.min(scene.clientWidth*.88,scene.clientWidth-24);return Math.round(desiredFrontEdge-(step*9+carWidth))}
 function offscreenLeft(){return Math.round(-carStep()*10-80)}
 function setConsistLeft(px,animate=true,duration="2.5s",easing="cubic-bezier(.18,.72,.18,1)"){consist.style.transition=animate?`left ${duration} ${easing}`:"none";consist.style.left=px+"px"}
-function arrive(){phase="arriving";updateStationBackground();setDoorOpen(false,false);passCounter.classList.remove("show");statusEl.textContent="まもなく到着";missionTitle.textContent="205系が入線します";promptEl.textContent=stations[stationIndex]+"駅に到着";feedback.textContent="先頭車が止まるまで見てね。";consist.classList.add("moving");consist.style.setProperty("--wheel-period","1.3s");setConsistLeft(offscreenLeft(),false);void consist.offsetWidth;setTimeout(()=>{setConsistLeft(stoppedLeft(),true,"3.2s")},80);setTimeout(()=>{consist.classList.remove("moving");arrivalSound();phase="question";statusEl.textContent="停車中";newProblem()},3400)}
+let wheelMotionFrame=0,wheelRotation=0,gameRunId=0,departureProgressTimer=0;
+function startWheelMotion(){
+  stopWheelMotion();
+  consist.classList.add("moving");
+  let previousLeft=consist.getBoundingClientRect().left;
+  const wheels=[...consist.querySelectorAll(".wheel")];
+  const diameter=wheels[0]?.offsetWidth||25;
+  function rotateWithTrain(){
+    const currentLeft=consist.getBoundingClientRect().left;
+    const distance=currentLeft-previousLeft;
+    previousLeft=currentLeft;
+    if(distance!==0){
+      wheelRotation=(wheelRotation+distance/diameter*360)%360;
+      const transform=`rotate(${wheelRotation}deg)`;
+      wheels.forEach(wheel=>wheel.style.transform=transform);
+    }
+    wheelMotionFrame=requestAnimationFrame(rotateWithTrain);
+  }
+  wheelMotionFrame=requestAnimationFrame(rotateWithTrain);
+}
+function stopWheelMotion(reset=false){
+  if(wheelMotionFrame)cancelAnimationFrame(wheelMotionFrame);
+  wheelMotionFrame=0;
+  if(departureProgressTimer)clearInterval(departureProgressTimer);
+  departureProgressTimer=0;
+  consist.classList.remove("moving");
+  if(reset){
+    wheelRotation=0;
+    consist.querySelectorAll(".wheel").forEach(wheel=>wheel.style.removeProperty("transform"));
+  }
+}
+function arrive(){
+  const runId=gameRunId;
+  phase="arriving";updateStationBackground();setDoorOpen(false,false);passCounter.classList.remove("show");statusEl.textContent="まもなく到着";missionTitle.textContent="205系が入線します";promptEl.textContent=stations[stationIndex]+"駅に到着";feedback.textContent="駅に近づく放送が流れるよ。";
+  setConsistLeft(offscreenLeft(),false);void consist.offsetWidth;startWheelMotion();announceApproach(stations[stationIndex]);
+  setTimeout(()=>{if(runId!==gameRunId)return;setConsistLeft(stoppedLeft(),true,"3.2s")},80);
+  setTimeout(()=>{if(runId!==gameRunId)return;stopWheelMotion();arrivalSound();phase="question";statusEl.textContent="停車中";newProblem()},3400);
+}
 function showSparkles(){sparkles.innerHTML="";[[16,65],[28,42],[43,72],[57,38],[69,67],[81,45],[90,70]].forEach((p,i)=>{const s=document.createElement("span");s.textContent=i%2?"⭐":"✨";s.style.left=p[0]+"%";s.style.top=p[1]+"%";s.style.animationDelay=i*.07+"s";sparkles.append(s)});sparkles.classList.add("show");setTimeout(()=>sparkles.classList.remove("show"),1200)}
 function departurePass(){
+  const runId=gameRunId;
   phase="departing";statusEl.textContent="発車";missionTitle.textContent="205系 発車！";promptEl.textContent="ゆっくり発車して、だんだん速くなるよ";departureSound();passCounter.classList.add("show");
   let passed=1;passCounter.textContent=`10両編成 通過中：${passed} / 10`;
   const bars=[...speedBars.querySelectorAll("i")];bars.forEach(b=>b.classList.remove("on"));speedText.textContent="0 km/h";
-  const step=carStep();const start=performance.now();const duration=Math.max(9000,step*10/0.48);consist.classList.add("moving");consist.style.setProperty("--wheel-period","1.3s");setConsistLeft(scene.clientWidth+60,true,(duration/1000)+"s","cubic-bezier(.48,0,1,1)");
-  const timer=setInterval(()=>{const elapsed=Math.min(duration,performance.now()-start);const t=elapsed/duration;const progress=t*t;passed=Math.min(10,1+Math.floor(progress*10));passCounter.textContent=`10両編成 通過中：${passed} / 10`;const kmh=Math.round(32*progress);speedText.textContent=`${kmh} km/h`;consist.style.setProperty("--wheel-period",`${Math.max(.26,1.3-progress*1.04)}s`);const lit=Math.min(6,Math.ceil(progress*6));bars.forEach((b,i)=>b.classList.toggle("on",i<lit));if(elapsed>=duration)clearInterval(timer)},90);
-  setTimeout(()=>{consist.classList.remove("moving");consist.style.setProperty("--wheel-period","1.3s");passCounter.classList.remove("show");bars.forEach(b=>b.classList.remove("on"));speedText.textContent="0 km/h";clearStations++;clearCount.textContent=clearStations;if(stationIndex>=stations.length-1){phase="finished";statusEl.textContent="終点";missionTitle.textContent="🎉 横浜線 全駅クリア！";promptEl.textContent="205系、運転成功！";feedback.className="feedback good";feedback.textContent="10両編成で八王子まで到着！";renderRoute();return}stationIndex++;currentStation.textContent=stations[stationIndex];stationSign.textContent=stations[stationIndex];renderRoute();setTimeout(arrive,600)},duration+250);
+  const step=carStep();const start=performance.now();const duration=Math.max(9000,step*10/0.48);startWheelMotion();setConsistLeft(scene.clientWidth+60,true,(duration/1000)+"s","cubic-bezier(.48,0,1,1)");
+  departureProgressTimer=setInterval(()=>{if(runId!==gameRunId){clearInterval(departureProgressTimer);departureProgressTimer=0;return}const elapsed=Math.min(duration,performance.now()-start);const t=elapsed/duration;const progress=t*t;passed=Math.min(10,1+Math.floor(progress*10));passCounter.textContent=`10両編成 通過中：${passed} / 10`;const kmh=Math.round(32*progress);speedText.textContent=`${kmh} km/h`;const lit=Math.min(6,Math.ceil(progress*6));bars.forEach((b,i)=>b.classList.toggle("on",i<lit));if(elapsed>=duration){clearInterval(departureProgressTimer);departureProgressTimer=0}},90);
+  setTimeout(()=>{if(runId!==gameRunId)return;stopWheelMotion();passCounter.classList.remove("show");bars.forEach(b=>b.classList.remove("on"));speedText.textContent="0 km/h";clearStations++;clearCount.textContent=clearStations;if(stationIndex>=stations.length-1){phase="finished";statusEl.textContent="終点";missionTitle.textContent="🎉 横浜線 全駅クリア！";promptEl.textContent="205系、運転成功！";feedback.className="feedback good";feedback.textContent="10両編成で八王子まで到着！";renderRoute();return}stationIndex++;currentStation.textContent=stations[stationIndex];stationSign.textContent=stations[stationIndex];renderRoute();setTimeout(()=>{if(runId===gameRunId)arrive()},600)},duration+250);
 }
 function correct(){
+  const runId=gameRunId;
   correctSound();feedback.className="feedback good";feedback.textContent="正解！ドアが開きます。";if(currentProblem.kind==="angle")drawAngle(currentProblem.answer,true);setDoorOpen(true);statusEl.textContent="ドア開";if(stations[stationIndex]==="相模原")showSparkles();
-  setTimeout(()=>{statusEl.textContent="♪ 発車メロディー";feedback.textContent="♪ 発車メロディーが流れています";const melodyMs=playDepartureMelody();setTimeout(()=>{setDoorOpen(false,true);statusEl.textContent="ドア閉";feedback.textContent="ドアが閉まりました。まもなく発車！";setTimeout(departurePass,1800)},melodyMs)},1200);
+  setTimeout(()=>{if(runId!==gameRunId)return;statusEl.textContent="♪ 発車メロディー";feedback.textContent="♪ 発車メロディーが流れています";const melodyMs=playDepartureMelody();setTimeout(()=>{if(runId!==gameRunId)return;setDoorOpen(false,true);statusEl.textContent="ドア閉";feedback.textContent="ドアが閉まりました。まもなく発車！";setTimeout(()=>{if(runId===gameRunId)departurePass()},1800)},melodyMs)},1200);
 }
