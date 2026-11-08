@@ -109,6 +109,17 @@ function doorImpactSound(){
   o2.connect(g2);g2.connect(audioContext.destination);o2.start(now+.02);o2.stop(now+.13);
 }
 function arrivalSound(){ensureAudio();tone(440,0,.18);tone(523,.2,.18);tone(659,.4,.35)}
+function announceApproach(station){
+  if(!soundEnabled||!("speechSynthesis" in window))return;
+  window.speechSynthesis.cancel();
+  const announcement=new SpeechSynthesisUtterance(`まもなく、${station}駅です。黄色い線までお下がりください。`);
+  announcement.lang="ja-JP";
+  announcement.rate=1.08;
+  announcement.volume=.85;
+  const japaneseVoice=window.speechSynthesis.getVoices().find(voice=>voice.lang.toLowerCase().startsWith("ja"));
+  if(japaneseVoice)announcement.voice=japaneseVoice;
+  window.speechSynthesis.speak(announcement);
+}
 function correctSound(){ensureAudio();tone(660,0,.15);tone(880,.14,.2);tone(1100,.3,.23)}
 function departureSound(){
   if(!soundEnabled)return;
