@@ -71,6 +71,7 @@ GitHub Pagesの静的配信だけで動作し、ページ読み込み後の主�
 - `correctSound()` : 正解音
 - `departureSound()` : 加速音
 - `playDepartureChime()` : 発車メロディの前に鳴らすオリジナル上昇音ベル
+- `playDepartureMelodyNote()` : 発車メロディの基音・倍音・音の余韻を生成
 - `playStationAnnouncement(kind)` : `audio/` 内の接近放送・発車放送を再生・停止
 - `playOriginalDepartureMelody()` : 第1メロディ
 - `playSpringBoxStyleMelody()` : 第2メロディ
